@@ -35,10 +35,11 @@ class Downloader {
     const { hostname } = new URL(url)
     console.log('downloading', url)
 
+    if (hostname === 'imgur.com') return this.ireddit(url)
     if (hostname === 'i.imgur.com') return this.imgur(url)
     if (hostname === 'i.redd.it') return this.ireddit(url)
 
-    throw new Error(`unsupported URL ${url}`)
+    throw new Error(`unsupported URL ${hostname} ${url}`)
   }
 }
 

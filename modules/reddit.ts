@@ -1,5 +1,6 @@
 import { Headers, FormData, fetch } from 'undici'
 import z from 'zod'
+import { inspect } from 'util'
 
 export class Reddit {
   constructor (
@@ -62,7 +63,7 @@ export class Reddit {
     const data = await fetch(`https://oauth.reddit.com${path}`, { method, headers, body })
       .then(response => response.json())
 
-    console.log(method, path, 'response', data)
+    console.log(method, path, 'response', inspect(data, { colors: true, depth: null }))
     return data
   }
 
@@ -107,7 +108,14 @@ export class Reddit {
             name: z.string(),
             permalink: z.string(),
             url: z.string(),
-            url_overridden_by_dest: z.string().nullable(),
+            media_metadata: z.record(z.string(), z.object({
+              m: z.string(),
+            })).optional(),
+            gallery_data: z.object({
+              items: z.array(z.object({
+                media_id: z.string(),
+              })),
+            }).optional(),
             domain: z.string(),
           }),
         })),

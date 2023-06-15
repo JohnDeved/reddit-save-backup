@@ -7,6 +7,7 @@ const ConfigSchema = z.object({
   CLIENT_SECRET: z.string().nonempty(),
   REDDIT_USERNAME: z.string().nonempty(),
   REDDIT_PASSWORD: z.string().nonempty(),
+  DISCORD_TOKEN: z.string().nonempty(),
 })
 
 export const config = ConfigSchema.parse(process.env)
