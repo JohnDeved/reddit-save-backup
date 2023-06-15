@@ -11,28 +11,22 @@ const discord = new Discord.Client({
 
 async function getChannel () {
   const channel = await discord.channels.fetch('1118929807057616937')
-  if (!channel?.isTextBased()) return
+  if (!channel?.isTextBased()) throw new Error('channel is not text based')
   return channel
 }
 
 async function uploadFile (name: string, file: Buffer) {
   // check if file is bigger than 25mb
   if (file.byteLength > 25 * 1024 * 1024) {
-    console.info('file is bigger than 25mb, saving to disk')
     const path = `./media/${name}`
     await writeFile(path, file)
-    return {
-      path,
-      id: '',
-    }
+    throw new Error(`file is bigger than 25mb, saving to disk ${path}`)
   }
 
   const channel = await getChannel()
-  if (!channel) return
   const message = await channel.send({ files: [new Discord.AttachmentBuilder(file, { name })] })
   const path = message.attachments.first()?.url
-  console.log('upload path', path)
-  if (!path) return
+  if (!path) throw new Error('attachment not found')
   return {
     path: path,
     id: message.id,
@@ -48,7 +42,7 @@ async function getRedditPosts () {
 
 async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>) {
   for (const { data: saved } of posts.children) {
-    if (stored.find(item => item.name === saved.name)) {
+    if (stored.find(item => item.name === saved.name && item.message)) {
       console.log('already saved', saved.name)
       continue
     }
@@ -69,7 +63,6 @@ async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>)
       try {
         const file = await downloader.download(saved.url)
         const upload = await uploadFile(`${saved.name}.${file.ext}`, file.buffer)
-        if (!upload) continue
         stored.push({
           name: saved.name,
           orgUrl: saved.url,
