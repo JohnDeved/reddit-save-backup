@@ -48,26 +48,30 @@ export class Reddit {
     return token
   }
 
-  /**
-   * Make a GET request to the Reddit API.
-   * https://www.reddit.com/dev/api/#GET_api_v1_me
-   */
-  async get (path: string) {
+  async getAuthHeader () {
     const token = await this.getToken()
+    const headers = new Headers()
+    headers.append('Authorization', `${token.token_type} ${token.access_token}`)
+    return headers
+  }
 
-    const myHeaders = new Headers()
-    myHeaders.append('Authorization', `${token.token_type} ${token.access_token}`)
+  async fetch (path: string, method: 'GET' | 'POST' = 'GET', body?: any) {
+    const headers = await this.getAuthHeader()
 
-    console.log('GET', path)
-    return fetch(`https://oauth.reddit.com${path}`, {
-      method: 'GET',
-      headers: myHeaders,
-    })
+    console.log(method, path)
+    const data = await fetch(`https://oauth.reddit.com${path}`, { method, headers, body })
       .then(response => response.json())
-      .then(data => {
-        console.log('GET', path, 'response', data)
-        return data
-      })
+
+    console.log(method, path, 'response', data)
+    return data
+  }
+
+  async get (path: string) {
+    return this.fetch(path)
+  }
+
+  async post (path: string, body: any) {
+    return this.fetch(path, 'POST', body)
   }
 
   private readonly _listingOptSchema = z.object({
@@ -89,7 +93,7 @@ export class Reddit {
   async getUserSaved (options: z.infer<typeof this._getUserSavedSchema> = {}) {
     const { username = this.username, ...opt } = this._getUserSavedSchema.parse(options)
 
-    const data = await this.get(`/user/${username}/saved?${new URLSearchParams(opt as any).toString()}`)
+    const response = await this.get(`/user/${username}/saved?${new URLSearchParams(opt as string).toString()}`)
     return z.object({
       kind: z.literal('Listing'),
       data: z.object({
@@ -108,6 +112,10 @@ export class Reddit {
           }),
         })),
       }),
-    }).parse(data)
+    }).parse(response).data
+  }
+
+  async setUserUnsaved (name: string) {
+    return this.post('/api/unsave', { id: name })
   }
 }
