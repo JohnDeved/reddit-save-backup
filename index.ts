@@ -1,10 +1,10 @@
 import * as Discord from 'discord.js'
-import { writeFile, readFile } from 'fs/promises'
 import { readFileSync } from 'fs'
+import { writeFile } from 'fs/promises'
+import z from 'zod'
 import { config } from './modules/config'
 import { downloader } from './modules/downloader'
 import { Reddit } from './modules/reddit'
-import z from 'zod'
 
 const discord = new Discord.Client({
   intents: ['GuildMessages'],
