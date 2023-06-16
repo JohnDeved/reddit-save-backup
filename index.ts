@@ -24,6 +24,8 @@ const stored = z.array(z.object({
   msgUrl: z.string().or(z.array(z.string())),
 })).parse(JSON.parse(readFileSync('./stored.json', 'utf8')))
 
+const oldSaved = z.array(z.string()).parse(JSON.parse(readFileSync('./old.saved.json', 'utf8')))
+
 async function getChannel () {
   const channel = await discord.channels.fetch('1118929807057616937')
   if (!channel?.isTextBased()) throw new Error('channel is not text based')
@@ -58,13 +60,19 @@ async function uploadFile (name: string, file: IncomingMessage) {
 }
 
 async function getRedditPosts () {
-  const posts = await reddit.getUserSaved({ limit: 100 })
-  console.log('saved posts', posts.children.length)
+  const { children: posts1 } = await reddit.getUserSaved({ limit: 100 })
+
+  // get first 50 entries of old saved posts
+  const ids = oldSaved.slice(0, 50)
+  const { children: posts2 } = await reddit.getPostInfos(ids)
+
+  const posts = [...posts1, ...posts2]
+  console.log('saved posts', posts.length)
   return posts
 }
 
 async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>) {
-  for (const { data: saved } of posts.children) {
+  for (const { data: saved } of posts) {
     if (stored.find(item => item.id === saved.id)) {
       console.log('already saved', saved.name)
       await reddit.setUserUnsaved(saved.name)
@@ -127,6 +135,8 @@ discord.login(config.DISCORD_TOKEN)
   .then(getRedditPosts)
   .then(downloadPosts)
   .then(async () => {
+    const _oldSaved = oldSaved.filter(id => !stored.find(item => item.name === id))
+    await writeFile('./old.saved.json', JSON.stringify(_oldSaved, null, 2))
     await writeFile('./stored.json', JSON.stringify(stored, null, 2))
     discord.destroy()
   })

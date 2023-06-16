@@ -87,6 +87,34 @@ export class Reddit {
     username: z.string().optional(),
   })
 
+  private readonly _listingSchema = z.object({
+    kind: z.literal('Listing'),
+    data: z.object({
+      after: z.string().nullable(),
+      before: z.string().nullable(),
+      modhash: z.string().nullable(),
+      children: z.array(z.object({
+        kind: z.literal('t3'),
+        data: z.object({
+          id: z.string(),
+          title: z.string(),
+          name: z.string(),
+          permalink: z.string(),
+          url: z.string(),
+          media_metadata: z.record(z.string(), z.object({
+            m: z.string(),
+          })).optional(),
+          gallery_data: z.object({
+            items: z.array(z.object({
+              media_id: z.string(),
+            })),
+          }).optional(),
+          domain: z.string(),
+        }),
+      })),
+    }),
+  })
+
   /**
    * Get a list of posts that the user has saved.
    * https://www.reddit.com/dev/api/#GET_user_{username}_saved
@@ -95,33 +123,12 @@ export class Reddit {
     const { username = this.username, ...opt } = this._getUserSavedSchema.parse(options)
 
     const response = await this.get(`/user/${username}/saved?${new URLSearchParams(opt as string).toString()}`)
-    return z.object({
-      kind: z.literal('Listing'),
-      data: z.object({
-        after: z.string().nullable(),
-        before: z.string().nullable(),
-        modhash: z.string().nullable(),
-        children: z.array(z.object({
-          kind: z.literal('t3'),
-          data: z.object({
-            id: z.string(),
-            title: z.string(),
-            name: z.string(),
-            permalink: z.string(),
-            url: z.string(),
-            media_metadata: z.record(z.string(), z.object({
-              m: z.string(),
-            })).optional(),
-            gallery_data: z.object({
-              items: z.array(z.object({
-                media_id: z.string(),
-              })),
-            }).optional(),
-            domain: z.string(),
-          }),
-        })),
-      }),
-    }).parse(response).data
+    return this._listingSchema.parse(response).data
+  }
+
+  async getPostInfos (names: string[]) {
+    const response = await this.get(`/api/info?id=${names.join(',')}`)
+    return this._listingSchema.parse(response).data
   }
 
   async setUserUnsaved (name: string) {
