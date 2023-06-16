@@ -76,7 +76,7 @@ async function handleDownloadError (saved: any, error: unknown) {
   if (error instanceof Error) {
     if (error.message.includes('removed')) {
       console.log('seems to be removed', saved)
-      oldSaved = oldSaved.filter(id => id !== saved.id)
+      oldSaved = oldSaved.filter(id => id !== saved.name)
       return reddit.setUserUnsaved(saved.name)
     }
   }
