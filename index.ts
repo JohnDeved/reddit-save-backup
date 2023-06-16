@@ -46,6 +46,11 @@ async function uploadFile (name: string, file: any) {
     throw new Error(`file is bigger than 25mb ${filePath}`)
   }
 
+  // check if file is smaller than 8kb
+  if (size < 8 * 1024) {
+    throw new Error(`file is smaller than 8kb ${filePath}`)
+  }
+
   const channel = await getChannel()
   const readStream = createReadStream(filePath)
   const message = await channel.send({ files: [new Discord.AttachmentBuilder(readStream, { name })] })
