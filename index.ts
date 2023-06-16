@@ -13,6 +13,11 @@ const discord = new Discord.Client({
   intents: ['GuildMessages'],
 })
 
+const issuePosts: Array<{
+  err: string
+  id: string
+}> = []
+
 const stored = z.array(z.object({
   id: z.string(),
   title: z.string(),
@@ -31,12 +36,16 @@ async function getChannel () {
   return channel
 }
 
-async function uploadFile (name: string, file: any) {
+async function uploadFile (name: string, file?: any) {
   const filePath = `./media/${name}`
   // check if file exists
   if (!existsSync(filePath)) {
     const writeStream = createWriteStream(filePath)
     await pipeline(file, writeStream)
+  } else {
+    // kill stream
+    console.log(`using cached file ${filePath}`)
+    file.cancel()
   }
   // get file size
   const { size } = await stat(filePath)
@@ -69,7 +78,7 @@ async function getRedditPosts () {
   const { children: posts1 } = await reddit.getUserSaved({ limit: 100 })
 
   // get first 50 entries of old saved posts
-  const ids = oldSaved.slice(0, 50)
+  const ids = oldSaved.slice(0, 100)
   const { children: posts2 } = await reddit.getPostInfos(ids)
 
   const posts = [...posts1, ...posts2]
@@ -85,6 +94,11 @@ async function handleDownloadError (saved: any, error: unknown) {
       return reddit.setUserUnsaved(saved.name)
     }
   }
+
+  issuePosts.push({
+    err: error instanceof Error ? error.message : JSON.stringify(error),
+    id: saved.name,
+  })
   console.error(error, saved)
 }
 
@@ -107,6 +121,7 @@ async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>)
         if (!ext) continue
         try {
           const url = `https://i.redd.it/${media_id}.${ext}`
+          console.log('downloading', media_id, url)
           const file = await downloader.download(url)
           const upload = await uploadFile(`${saved.name}.${index}.${file.ext}`, file.stream)
           orgUrls.push(url)
@@ -129,6 +144,7 @@ async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>)
       await writeFile('./stored.json', JSON.stringify(stored, null, 2))
     } else {
       try {
+        console.log('downloading', saved.name, saved.url)
         const file = await downloader.download(saved.url)
         const upload = await uploadFile(`${saved.name}.${file.ext}`, file.stream)
         stored.push({
@@ -157,5 +173,7 @@ discord.login(config.DISCORD_TOKEN)
     await writeFile('./stored.json', JSON.stringify(stored, null, 2))
     discord.destroy()
     console.log('done')
+    console.log(issuePosts)
+    console.log(`issues https://www.reddit.com/api/info?id=${issuePosts.map(i => i.id).join(',')}`)
   })
 // get all guilds

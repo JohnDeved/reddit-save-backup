@@ -46,7 +46,6 @@ class Downloader {
 
   download (url: string) {
     const { hostname } = new URL(url)
-    console.log('downloading', url)
 
     if (hostname === 'imgur.com') return this.direct(url)
     if (hostname === 'i.imgur.com') return this.imgur(url)
