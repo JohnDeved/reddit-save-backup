@@ -1,6 +1,6 @@
 import * as Discord from 'discord.js'
 import { createReadStream, createWriteStream, existsSync, readFileSync } from 'fs'
-import { stat, writeFile } from 'fs/promises'
+import { stat, writeFile, unlink } from 'fs/promises'
 import { pipeline } from 'stream/promises'
 import z from 'zod'
 import { config } from './modules/config'
@@ -52,6 +52,8 @@ async function uploadFile (name: string, file: IncomingMessage) {
   const message = await channel.send({ files: [new Discord.AttachmentBuilder(readStream, { name })] })
   const path = message.attachments.first()?.url
   if (!path) throw new Error('attachment not found')
+
+  await unlink(filePath)
   return {
     path: path,
     id: message.id,
@@ -139,5 +141,6 @@ discord.login(config.DISCORD_TOKEN)
     await writeFile('./old.saved.json', JSON.stringify(_oldSaved, null, 2))
     await writeFile('./stored.json', JSON.stringify(stored, null, 2))
     discord.destroy()
+    console.log('done')
   })
 // get all guilds

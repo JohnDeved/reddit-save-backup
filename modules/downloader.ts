@@ -16,7 +16,7 @@ class Downloader {
     const regex = /\.(\w{3,4})(\?.*)?$/
     const extension = url.match(regex)?.[1]
     if (!extension) throw new Error(`imgur unexpected URL ${url}`)
-    if (!['jpg', 'png', 'gifv'].includes(extension)) throw new Error(`imgur unsupported extension ${extension}`)
+    if (!['jpg', 'png', 'gifv', 'gif'].includes(extension)) throw new Error(`imgur unsupported extension ${extension}`)
 
     let ext = extension
     if (ext === 'gifv') {
@@ -85,6 +85,21 @@ class Downloader {
       .then(stream => ({ stream, ext: 'mp4' }))
   }
 
+  konachan (url: string) {
+    const regex = /\.(\w{3,4})(\?.*)?$/
+    const ext = url.match(regex)?.[1]
+    if (!ext) throw new Error(`konachan unexpected URL ${url}`)
+    if (!['jpg', 'png', 'gif'].includes(ext)) throw new Error(`konachan unsupported extension ${ext}`)
+
+    return get(url)
+      .then(response => {
+        if (!response.readable) throw new Error(`konachan unexpected BODY ${url}`)
+        if (response.statusCode !== 200) throw new Error(`konachan unexpected STATUS ${response.statusCode ?? 0} ${url}`)
+        return response
+      })
+      .then(stream => ({ stream, ext }))
+  }
+
   download (url: string) {
     const { hostname } = new URL(url)
     console.log('downloading', url)
@@ -95,6 +110,7 @@ class Downloader {
     if (hostname === 'files.catbox.moe') return this.catbox(url)
     if (hostname === 'www.redgifs.com') return this.redgifs(url)
     if (hostname === 'redgifs.com') return this.redgifs(url)
+    if (hostname === 'konachan.com') return this.konachan(url)
 
     throw new Error(`unsupported URL ${hostname} ${url}`)
   }
