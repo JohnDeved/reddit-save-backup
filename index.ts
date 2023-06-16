@@ -6,7 +6,6 @@ import z from 'zod'
 import { config } from './modules/config'
 import { downloader } from './modules/downloader'
 import { Reddit } from './modules/reddit'
-import type { IncomingMessage } from 'http'
 
 const reddit = new Reddit(config.CLIENT_ID, config.CLIENT_SECRET, config.REDDIT_USERNAME, config.REDDIT_PASSWORD)
 
@@ -32,7 +31,7 @@ async function getChannel () {
   return channel
 }
 
-async function uploadFile (name: string, file: IncomingMessage) {
+async function uploadFile (name: string, file: any) {
   const filePath = `./media/${name}`
   // check if file exists
   if (!existsSync(filePath)) {

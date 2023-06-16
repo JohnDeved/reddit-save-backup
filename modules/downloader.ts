@@ -1,17 +1,22 @@
 import { load as loadHtml } from 'cheerio'
-import type { IncomingMessage } from 'http'
-import { get as _get } from 'https'
 import { fetch } from 'undici'
 
-function get (url: string) {
-  return new Promise<IncomingMessage>((resolve) => {
-    _get(url, res => {
-      resolve(res)
-    })
-  })
-}
-
 class Downloader {
+  direct (url: string) {
+    const regex = /\.(\w{3,4})(\?.*)?$/
+    const ext = url.match(regex)?.[1]
+    if (!ext) throw new Error(`direct unexpected URL ${url}`)
+    if (!['jpg', 'png', 'gif', 'mp4'].includes(ext)) throw new Error(`direct unsupported extension ${ext}`)
+
+    return fetch(url)
+      .then(response => {
+        if (!response.ok) throw new Error(`direct unexpected BODY ${url}`)
+        if (response.url.includes('removed')) throw new Error(`direct removed ${url}`)
+        return response.body
+      })
+      .then(stream => ({ stream, ext }))
+  }
+
   imgur (url: string) {
     const regex = /\.(\w{3,4})(\?.*)?$/
     const extension = url.match(regex)?.[1]
@@ -24,93 +29,34 @@ class Downloader {
       ext = 'mp4'
     }
 
-    return get(url)
-      .then(response => {
-        if (!response.readable) throw new Error(`imgur unexpected BODY ${url}`)
-        if (response.statusCode !== 200) throw new Error(`imgur unexpected STATUS ${response.statusCode ?? 0} ${url}`)
-        return response
-      })
-      .then(stream => ({ stream, ext }))
+    return this.direct(url)
   }
 
-  ireddit (url: string) {
-    const regex = /\.(\w{3,4})(\?.*)?$/
-    const ext = url.match(regex)?.[1]
-    if (!ext) throw new Error(`ireddit unexpected URL ${url}`)
-    if (!['jpg', 'png', 'gif'].includes(ext)) throw new Error(`ireddit unsupported extension ${ext}`)
-
-    return get(url)
-      .then(response => {
-        if (!response.readable) throw new Error(`ireddit unexpected BODY ${url}`)
-        if (response.statusCode !== 200) throw new Error(`ireddit unexpected STATUS ${response.statusCode ?? 0} ${url}`)
-        return response
-      })
-      .then(stream => ({ stream, ext }))
-  }
-
-  catbox (url: string) {
-    const regex = /\.(\w{3,4})(\?.*)?$/
-    const ext = url.match(regex)?.[1]
-    if (!ext) throw new Error(`catbox unexpected URL ${url}`)
-    if (!['jpg', 'png', 'gif', 'mp4'].includes(ext)) throw new Error(`catbox unsupported extension ${ext}`)
-
-    return get(url)
-      .then(response => {
-        if (!response.readable) throw new Error(`catbox unexpected BODY ${url}`)
-        if (response.statusCode !== 200) throw new Error(`catbox unexpected STATUS ${response.statusCode ?? 0} ${url}`)
-        return response
-      })
-      .then(stream => ({ stream, ext }))
-  }
-
-  redgifs (url: string) {
-    // make use of og meta tags to get the video URL
-    // og:video
-    // <meta property="og:video" content="https://thumbs2.redgifs.com/UnsightlyUnsungGermanshorthairedpointer-mobile.mp4">
-
+  gfycat (url: string) {
     return fetch(url)
       .then(response => response.text())
       .then(html => {
         const $ = loadHtml(html)
         const videoUrl = $('meta[property="og:video"]').attr('content')
-        if (!videoUrl) throw new Error(`redgifs unexpected URL ${url}`)
+        if (!videoUrl) throw new Error(`gfycat og:video not found ${url}`)
         return videoUrl
       })
-      .then(videoUrl => get(videoUrl))
-      .then(response => {
-        if (!response.readable) throw new Error(`redgifs unexpected BODY ${url}`)
-        if (response.statusCode !== 200) throw new Error(`redgifs unexpected STATUS ${response.statusCode ?? 0} ${url}`)
-        return response
-      })
-      .then(stream => ({ stream, ext: 'mp4' }))
-  }
-
-  konachan (url: string) {
-    const regex = /\.(\w{3,4})(\?.*)?$/
-    const ext = url.match(regex)?.[1]
-    if (!ext) throw new Error(`konachan unexpected URL ${url}`)
-    if (!['jpg', 'png', 'gif'].includes(ext)) throw new Error(`konachan unsupported extension ${ext}`)
-
-    return get(url)
-      .then(response => {
-        if (!response.readable) throw new Error(`konachan unexpected BODY ${url}`)
-        if (response.statusCode !== 200) throw new Error(`konachan unexpected STATUS ${response.statusCode ?? 0} ${url}`)
-        return response
-      })
-      .then(stream => ({ stream, ext }))
+      .then(this.direct)
   }
 
   download (url: string) {
     const { hostname } = new URL(url)
     console.log('downloading', url)
 
-    if (hostname === 'imgur.com') return this.ireddit(url)
+    if (hostname === 'imgur.com') return this.direct(url)
     if (hostname === 'i.imgur.com') return this.imgur(url)
-    if (hostname === 'i.redd.it') return this.ireddit(url)
-    if (hostname === 'files.catbox.moe') return this.catbox(url)
-    if (hostname === 'www.redgifs.com') return this.redgifs(url)
-    if (hostname === 'redgifs.com') return this.redgifs(url)
-    if (hostname === 'konachan.com') return this.konachan(url)
+    if (hostname === 'i.redd.it') return this.direct(url)
+    if (hostname === 'files.catbox.moe') return this.direct(url)
+    if (hostname === 'cdn.awwni.me') return this.direct(url)
+    if (hostname === 'www.redgifs.com') return this.gfycat(url)
+    if (hostname === 'redgifs.com') return this.gfycat(url)
+    if (hostname === 'gfycat.com') return this.gfycat(url)
+    if (hostname === 'konachan.com') return this.direct(url)
 
     throw new Error(`unsupported URL ${hostname} ${url}`)
   }
