@@ -14,10 +14,10 @@ const stored = z.array(z.object({
   id: z.string(),
   title: z.string(),
   name: z.string(),
-  orgUrl: z.string(),
-  cdnUrl: z.string(),
-  msgId: z.string().optional(),
-  msgUrl: z.string().optional(),
+  orgUrl: z.string().url().or(z.array(z.string().url())),
+  cdnUrl: z.string().url().or(z.array(z.string().url())),
+  msgId: z.string().or(z.array(z.string())),
+  msgUrl: z.string().or(z.array(z.string())),
 })).parse(JSON.parse(readFileSync('./stored.json', 'utf8')))
 
 async function getChannel () {
@@ -59,18 +59,38 @@ async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>)
       continue
     }
     if (saved.gallery_data && saved.media_metadata) {
-      // for (const { media_id } of saved.gallery_data.items) {
-      //   const index = saved.gallery_data.items.findIndex(item => item.media_id === media_id)
-      //   const media = saved.media_metadata[media_id]
-      //   const ext = media.m.split('/').pop()
-      //   if (!ext) continue
-      //   try {
-      //     const file = await downloader.download(`https://i.redd.it/${media_id}.${ext}`)
-      //     await writeFile(`./media/${saved.name}.${index}.${file.ext}`, file.buffer)
-      //   } catch (error) {
-      //     console.error(error, saved)
-      //   }
-      // }
+      const orgUrls: string[] = []
+      const cdnUrls: string[] = []
+      const msgIds: string[] = []
+      const msgUrls: string[] = []
+      for (const { media_id } of saved.gallery_data.items) {
+        const index = saved.gallery_data.items.findIndex(item => item.media_id === media_id)
+        const media = saved.media_metadata[media_id]
+        const ext = media.m.split('/').pop()
+        if (!ext) continue
+        try {
+          const url = `https://i.redd.it/${media_id}.${ext}`
+          const file = await downloader.download(url)
+          // await writeFile(`./media/${saved.name}.${index}.${file.ext}`, file.buffer)
+          const upload = await uploadFile(`${saved.name}.${index}.${file.ext}`, file.buffer)
+          orgUrls.push(url)
+          cdnUrls.push(upload.path)
+          msgIds.push(upload.id)
+          msgUrls.push(upload.url)
+        } catch (error) {
+          console.error(error, saved)
+        }
+      }
+      stored.push({
+        id: saved.id,
+        title: saved.title,
+        name: saved.name,
+        orgUrl: orgUrls,
+        cdnUrl: cdnUrls,
+        msgId: msgIds,
+        msgUrl: msgUrls,
+      })
+      await writeFile('./stored.json', JSON.stringify(stored, null, 2))
     } else {
       try {
         const file = await downloader.download(saved.url)
