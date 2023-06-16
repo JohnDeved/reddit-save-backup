@@ -2,5 +2,5 @@ node_modules
 package-lock.json
 .env
 media/*
-!.gitkeep
+!media/.gitkeep
 .DS_Store
