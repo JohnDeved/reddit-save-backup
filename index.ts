@@ -1,13 +1,24 @@
 import * as Discord from 'discord.js'
-import { writeFile } from 'fs/promises'
+import { writeFile, readFile } from 'fs/promises'
+import { readFileSync } from 'fs'
 import { config } from './modules/config'
 import { downloader } from './modules/downloader'
 import { Reddit } from './modules/reddit'
-import stored from './stored.json'
+import z from 'zod'
 
 const discord = new Discord.Client({
   intents: ['GuildMessages'],
 })
+
+const stored = z.array(z.object({
+  id: z.string(),
+  title: z.string(),
+  name: z.string(),
+  orgUrl: z.string(),
+  cdnUrl: z.string(),
+  msgId: z.string().optional(),
+  msgUrl: z.string().optional(),
+})).parse(JSON.parse(readFileSync('./stored.json', 'utf8')))
 
 async function getChannel () {
   const channel = await discord.channels.fetch('1118929807057616937')
@@ -30,6 +41,7 @@ async function uploadFile (name: string, file: Buffer) {
   return {
     path: path,
     id: message.id,
+    url: message.url,
   }
 }
 
@@ -42,7 +54,7 @@ async function getRedditPosts () {
 
 async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>) {
   for (const { data: saved } of posts.children) {
-    if (stored.find(item => item.name === saved.name && item.message)) {
+    if (stored.find(item => item.id === saved.id)) {
       console.log('already saved', saved.name)
       continue
     }
@@ -64,10 +76,13 @@ async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>)
         const file = await downloader.download(saved.url)
         const upload = await uploadFile(`${saved.name}.${file.ext}`, file.buffer)
         stored.push({
+          id: saved.id,
+          title: saved.title,
           name: saved.name,
           orgUrl: saved.url,
           cdnUrl: upload.path,
-          message: upload.id,
+          msgId: upload.id,
+          msgUrl: upload.url,
         })
       } catch (error) {
         console.error(error, saved)

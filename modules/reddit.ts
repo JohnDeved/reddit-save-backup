@@ -104,6 +104,7 @@ export class Reddit {
         children: z.array(z.object({
           kind: z.literal('t3'),
           data: z.object({
+            id: z.string(),
             title: z.string(),
             name: z.string(),
             permalink: z.string(),
