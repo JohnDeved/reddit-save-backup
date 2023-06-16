@@ -63,7 +63,7 @@ export class Reddit {
     const data = await fetch(`https://oauth.reddit.com${path}`, { method, headers, body })
       .then(response => response.json())
 
-    // console.log(method, path, 'response', inspect(data, { colors: true, depth: null }))
+    console.log(method, path, 'response', inspect(data, { colors: true, depth: null }))
     return data
   }
 
@@ -125,6 +125,6 @@ export class Reddit {
   }
 
   async setUserUnsaved (name: string) {
-    return this.post('/api/unsave', { id: name })
+    return this.post(`/api/unsave?id=${name}`, {})
   }
 }

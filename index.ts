@@ -8,6 +8,8 @@ import { downloader } from './modules/downloader'
 import { Reddit } from './modules/reddit'
 import type { IncomingMessage } from 'http'
 
+const reddit = new Reddit(config.CLIENT_ID, config.CLIENT_SECRET, config.REDDIT_USERNAME, config.REDDIT_PASSWORD)
+
 const discord = new Discord.Client({
   intents: ['GuildMessages'],
 })
@@ -56,7 +58,6 @@ async function uploadFile (name: string, file: IncomingMessage) {
 }
 
 async function getRedditPosts () {
-  const reddit = new Reddit(config.CLIENT_ID, config.CLIENT_SECRET, config.REDDIT_USERNAME, config.REDDIT_PASSWORD)
   const posts = await reddit.getUserSaved({ limit: 100 })
   console.log('saved posts', posts.children.length)
   return posts
@@ -66,6 +67,7 @@ async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>)
   for (const { data: saved } of posts.children) {
     if (stored.find(item => item.id === saved.id)) {
       console.log('already saved', saved.name)
+      await reddit.setUserUnsaved(saved.name)
       continue
     }
     if (saved.gallery_data && saved.media_metadata) {

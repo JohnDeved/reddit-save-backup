@@ -42,6 +42,7 @@ class Downloader {
     return get(url)
       .then(response => {
         if (!response.readable) throw new Error(`ireddit unexpected BODY ${url}`)
+        if (response.statusCode !== 200) throw new Error(`ireddit unexpected STATUS ${response.statusCode ?? 0} ${url}`)
         return response
       })
       .then(stream => ({ stream, ext }))
@@ -56,6 +57,7 @@ class Downloader {
     return get(url)
       .then(response => {
         if (!response.readable) throw new Error(`catbox unexpected BODY ${url}`)
+        if (response.statusCode !== 200) throw new Error(`catbox unexpected STATUS ${response.statusCode ?? 0} ${url}`)
         return response
       })
       .then(stream => ({ stream, ext }))
@@ -77,6 +79,7 @@ class Downloader {
       .then(videoUrl => get(videoUrl))
       .then(response => {
         if (!response.readable) throw new Error(`redgifs unexpected BODY ${url}`)
+        if (response.statusCode !== 200) throw new Error(`redgifs unexpected STATUS ${response.statusCode ?? 0} ${url}`)
         return response
       })
       .then(stream => ({ stream, ext: 'mp4' }))
