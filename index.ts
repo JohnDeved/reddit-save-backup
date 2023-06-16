@@ -84,6 +84,7 @@ async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>)
           msgId: upload.id,
           msgUrl: upload.url,
         })
+        await writeFile('./stored.json', JSON.stringify(stored, null, 2))
       } catch (error) {
         console.error(error, saved)
       }
