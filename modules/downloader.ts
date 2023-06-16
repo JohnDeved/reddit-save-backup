@@ -1,5 +1,15 @@
-import { fetch } from 'undici'
 import { load as loadHtml } from 'cheerio'
+import type { IncomingMessage } from 'http'
+import { get as _get } from 'https'
+import { fetch } from 'undici'
+
+function get (url: string) {
+  return new Promise<IncomingMessage>((resolve) => {
+    _get(url, res => {
+      resolve(res)
+    })
+  })
+}
 
 class Downloader {
   imgur (url: string) {
@@ -14,10 +24,12 @@ class Downloader {
       ext = 'mp4'
     }
 
-    return fetch(url)
-      .then(response => response.arrayBuffer())
-      .then(buffer => Buffer.from(buffer))
-      .then(buffer => ({ buffer, ext }))
+    return get(url)
+      .then(response => {
+        if (!response.readable) throw new Error(`imgur unexpected BODY ${url}`)
+        return response
+      })
+      .then(stream => ({ stream, ext }))
   }
 
   ireddit (url: string) {
@@ -26,10 +38,12 @@ class Downloader {
     if (!ext) throw new Error(`ireddit unexpected URL ${url}`)
     if (!['jpg', 'png', 'gif'].includes(ext)) throw new Error(`ireddit unsupported extension ${ext}`)
 
-    return fetch(url)
-      .then(response => response.arrayBuffer())
-      .then(buffer => Buffer.from(buffer))
-      .then(buffer => ({ buffer, ext }))
+    return get(url)
+      .then(response => {
+        if (!response.readable) throw new Error(`ireddit unexpected BODY ${url}`)
+        return response
+      })
+      .then(stream => ({ stream, ext }))
   }
 
   catbox (url: string) {
@@ -38,10 +52,12 @@ class Downloader {
     if (!ext) throw new Error(`catbox unexpected URL ${url}`)
     if (!['jpg', 'png', 'gif', 'mp4'].includes(ext)) throw new Error(`catbox unsupported extension ${ext}`)
 
-    return fetch(url)
-      .then(response => response.arrayBuffer())
-      .then(buffer => Buffer.from(buffer))
-      .then(buffer => ({ buffer, ext }))
+    return get(url)
+      .then(response => {
+        if (!response.readable) throw new Error(`catbox unexpected BODY ${url}`)
+        return response
+      })
+      .then(stream => ({ stream, ext }))
   }
 
   redgifs (url: string) {
@@ -57,10 +73,12 @@ class Downloader {
         if (!videoUrl) throw new Error(`redgifs unexpected URL ${url}`)
         return videoUrl
       })
-      .then(videoUrl => fetch(videoUrl))
-      .then(response => response.arrayBuffer())
-      .then(buffer => Buffer.from(buffer))
-      .then(buffer => ({ buffer, ext: 'mp4' }))
+      .then(videoUrl => get(videoUrl))
+      .then(response => {
+        if (!response.readable) throw new Error(`redgifs unexpected BODY ${url}`)
+        return response
+      })
+      .then(stream => ({ stream, ext: 'mp4' }))
   }
 
   download (url: string) {

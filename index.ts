@@ -1,10 +1,12 @@
 import * as Discord from 'discord.js'
-import { readFileSync } from 'fs'
-import { writeFile } from 'fs/promises'
+import { createReadStream, createWriteStream, readFileSync } from 'fs'
+import { stat, writeFile } from 'fs/promises'
+import { pipeline } from 'stream/promises'
 import z from 'zod'
 import { config } from './modules/config'
 import { downloader } from './modules/downloader'
 import { Reddit } from './modules/reddit'
+import type { IncomingMessage } from 'http'
 
 const discord = new Discord.Client({
   intents: ['GuildMessages'],
@@ -26,16 +28,21 @@ async function getChannel () {
   return channel
 }
 
-async function uploadFile (name: string, file: Buffer) {
+async function uploadFile (name: string, file: IncomingMessage | ReadableStream) {
+  const filePath = `./media/${name}`
+  const writeStream = createWriteStream(filePath)
+  await pipeline([file], writeStream)
+  // get file size
+  const { size } = await stat(filePath)
+
   // check if file is bigger than 25mb
-  if (file.byteLength > 25 * 1024 * 1024) {
-    const path = `./media/${name}`
-    await writeFile(path, file)
-    throw new Error(`file is bigger than 25mb, saving to disk ${path}`)
+  if (size > 25 * 1024 * 1024) {
+    throw new Error(`file is bigger than 25mb ${filePath}`)
   }
 
   const channel = await getChannel()
-  const message = await channel.send({ files: [new Discord.AttachmentBuilder(file, { name })] })
+  const readStream = createReadStream(filePath)
+  const message = await channel.send({ files: [new Discord.AttachmentBuilder(readStream, { name })] })
   const path = message.attachments.first()?.url
   if (!path) throw new Error('attachment not found')
   return {
@@ -71,8 +78,7 @@ async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>)
         try {
           const url = `https://i.redd.it/${media_id}.${ext}`
           const file = await downloader.download(url)
-          // await writeFile(`./media/${saved.name}.${index}.${file.ext}`, file.buffer)
-          const upload = await uploadFile(`${saved.name}.${index}.${file.ext}`, file.buffer)
+          const upload = await uploadFile(`${saved.name}.${index}.${file.ext}`, file.stream)
           orgUrls.push(url)
           cdnUrls.push(upload.path)
           msgIds.push(upload.id)
@@ -94,7 +100,7 @@ async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>)
     } else {
       try {
         const file = await downloader.download(saved.url)
-        const upload = await uploadFile(`${saved.name}.${file.ext}`, file.buffer)
+        const upload = await uploadFile(`${saved.name}.${file.ext}`, file.stream)
         stored.push({
           id: saved.id,
           title: saved.title,
