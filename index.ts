@@ -28,10 +28,10 @@ async function getChannel () {
   return channel
 }
 
-async function uploadFile (name: string, file: IncomingMessage | ReadableStream) {
+async function uploadFile (name: string, file: IncomingMessage) {
   const filePath = `./media/${name}`
   const writeStream = createWriteStream(filePath)
-  await pipeline([file], writeStream)
+  await pipeline(file, writeStream)
   // get file size
   const { size } = await stat(filePath)
 
