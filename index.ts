@@ -1,5 +1,5 @@
 import * as Discord from 'discord.js'
-import { createReadStream, createWriteStream, readFileSync } from 'fs'
+import { createReadStream, createWriteStream, existsSync, readFileSync } from 'fs'
 import { stat, writeFile } from 'fs/promises'
 import { pipeline } from 'stream/promises'
 import z from 'zod'
@@ -30,8 +30,11 @@ async function getChannel () {
 
 async function uploadFile (name: string, file: IncomingMessage) {
   const filePath = `./media/${name}`
-  const writeStream = createWriteStream(filePath)
-  await pipeline(file, writeStream)
+  // check if file exists
+  if (!existsSync(filePath)) {
+    const writeStream = createWriteStream(filePath)
+    await pipeline(file, writeStream)
+  }
   // get file size
   const { size } = await stat(filePath)
 
