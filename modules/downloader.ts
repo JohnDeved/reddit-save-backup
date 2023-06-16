@@ -10,7 +10,7 @@ class Downloader {
 
     return fetch(url)
       .then(response => {
-        if (!response.ok) throw new Error(`direct unexpected BODY ${url}`)
+        if (!response.ok) throw new Error(`direct unexpected BODY (removed) ${url}`)
         if (response.url.includes('removed')) throw new Error(`direct removed ${url}`)
         return response.body
       })
@@ -38,7 +38,7 @@ class Downloader {
       .then(html => {
         const $ = loadHtml(html)
         const videoUrl = $('meta[property="og:video"]').attr('content')
-        if (!videoUrl) throw new Error(`gfycat og:video not found ${url}`)
+        if (!videoUrl) throw new Error(`gfycat og:video not found (removed) ${url}`)
         return videoUrl
       })
       .then(this.direct)

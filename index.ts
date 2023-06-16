@@ -23,7 +23,7 @@ const stored = z.array(z.object({
   msgUrl: z.string().or(z.array(z.string())),
 })).parse(JSON.parse(readFileSync('./stored.json', 'utf8')))
 
-const oldSaved = z.array(z.string()).parse(JSON.parse(readFileSync('./old.saved.json', 'utf8')))
+let oldSaved = z.array(z.string()).parse(JSON.parse(readFileSync('./old.saved.json', 'utf8')))
 
 async function getChannel () {
   const channel = await discord.channels.fetch('1118929807057616937')
@@ -72,6 +72,17 @@ async function getRedditPosts () {
   return posts
 }
 
+async function handleDownloadError (saved: any, error: unknown) {
+  if (error instanceof Error) {
+    if (error.message.includes('removed')) {
+      console.log('seems to be removed', saved)
+      oldSaved = oldSaved.filter(id => id !== saved.id)
+      return reddit.setUserUnsaved(saved.name)
+    }
+  }
+  console.error(error, saved)
+}
+
 async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>) {
   for (const { data: saved } of posts) {
     if (stored.find(item => item.id === saved.id)) {
@@ -98,7 +109,7 @@ async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>)
           msgIds.push(upload.id)
           msgUrls.push(upload.url)
         } catch (error) {
-          console.error(error, saved)
+          await handleDownloadError(saved, error)
         }
       }
       stored.push({
@@ -126,7 +137,7 @@ async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>)
         })
         await writeFile('./stored.json', JSON.stringify(stored, null, 2))
       } catch (error) {
-        console.error(error, saved)
+        await handleDownloadError(saved, error)
       }
     }
   }
@@ -136,8 +147,8 @@ discord.login(config.DISCORD_TOKEN)
   .then(getRedditPosts)
   .then(downloadPosts)
   .then(async () => {
-    const _oldSaved = oldSaved.filter(id => !stored.find(item => item.name === id))
-    await writeFile('./old.saved.json', JSON.stringify(_oldSaved, null, 2))
+    oldSaved = oldSaved.filter(id => !stored.find(item => item.name === id))
+    await writeFile('./old.saved.json', JSON.stringify(oldSaved, null, 2))
     await writeFile('./stored.json', JSON.stringify(stored, null, 2))
     discord.destroy()
     console.log('done')
