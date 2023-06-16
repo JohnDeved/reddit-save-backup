@@ -27,6 +27,7 @@ class Downloader {
     return get(url)
       .then(response => {
         if (!response.readable) throw new Error(`imgur unexpected BODY ${url}`)
+        if (response.statusCode !== 200) throw new Error(`imgur unexpected STATUS ${response.statusCode ?? 0} ${url}`)
         return response
       })
       .then(stream => ({ stream, ext }))
