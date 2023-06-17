@@ -40,6 +40,7 @@ async function getChannel () {
 async function uploadFile (name: string, file?: any) {
   const filePath = `./media/${name}`
   // check if file exists
+  let cached = false
   if (!existsSync(filePath)) {
     const writeStream = createWriteStream(filePath)
     await pipeline(file, writeStream)
@@ -48,6 +49,7 @@ async function uploadFile (name: string, file?: any) {
     // kill stream
     console.log(`using cached file ${filePath}`)
     file.cancel()
+    cached = true
   }
   // get file size
   const { size } = await stat(filePath)
@@ -60,6 +62,10 @@ async function uploadFile (name: string, file?: any) {
   // check if file is smaller than 8kb
   if (size < 8 * 1024) {
     throw new Error(`file is smaller than 8kb ${filePath}`)
+  }
+
+  if (cached) {
+    throw new Error(`file upload aborted ${filePath}`)
   }
 
   const channel = await getChannel()
@@ -79,7 +85,6 @@ async function uploadFile (name: string, file?: any) {
 async function getRedditPosts () {
   const { children: posts1 } = await reddit.getUserSaved({ limit: 100 })
 
-  // get first 50 entries of old saved posts
   const ids = oldSaved.slice(0, 100)
   const { children: posts2 } = await reddit.getPostInfos(ids)
 
@@ -176,8 +181,8 @@ discord.login(config.DISCORD_TOKEN)
     await writeFile('./old.saved.json', JSON.stringify(oldSaved, null, 2))
     await writeFile('./stored.json', JSON.stringify(stored, null, 2))
     discord.destroy()
-    console.log('done')
+    console.log('done, issues:', issuePosts.length)
     console.log(issuePosts)
-    console.log(`issues https://www.reddit.com/api/info?id=${issuePosts.map(i => i.id).join(',')}`)
+    console.log(`https://www.reddit.com/api/info?id=${issuePosts.map(i => i.id).join(',')}`)
   })
 // get all guilds
