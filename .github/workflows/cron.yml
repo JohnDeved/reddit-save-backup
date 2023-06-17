@@ -1,1 +1,26 @@
-# cron
+# github workflow cron job that runs npm start every hour
+# https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#onschedule
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 * * * *'
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 19.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 19.x
+      - name: npm install and start
+        run: |
+          npm install
+          npm start
+      - name: Commit files
+        run: |
+          git add .
+          git commit -m "Commit message"
+          git push
