@@ -194,7 +194,8 @@ discord.login(config.DISCORD_TOKEN)
     await writeFile('./stored.json', JSON.stringify(stored, null, 2))
     discord.destroy()
     console.log('done, issues:', issuePosts.length)
-    console.log(issuePosts)
+    // sort by error texts by alphabet
+    console.log(issuePosts.sort((a, b) => a.err.localeCompare(b.err)))
     console.log(`https://www.reddit.com/api/info?id=${issuePosts.map(i => i.id).join(',')}`)
   })
 // get all guilds
