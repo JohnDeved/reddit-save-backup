@@ -196,5 +196,13 @@ discord.login(config.DISCORD_TOKEN)
     console.log('done, issues:', issuePosts.length)
     // sort by error texts by alphabet
     console.log(issuePosts.sort((a, b) => a.err.localeCompare(b.err)))
-    console.log(`https://www.reddit.com/api/info?id=${issuePosts.map(i => i.id).join(',')}`)
+    const listing = `https://www.reddit.com/api/info?id=${issuePosts.map(i => i.id).join(',')}`
+    console.log(listing)
+
+    // write issues to file
+    await writeFile('./issues.json', JSON.stringify({
+      count: issuePosts.length,
+      listing,
+      posts: issuePosts,
+    }, null, 2))
   })
