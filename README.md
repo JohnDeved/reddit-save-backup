@@ -1,4 +1,4 @@
-# imgur-reddit-backup
+# reddit-save-backup
 
 - make use of github actions to scedule reddit api calls
   - no hosting required
