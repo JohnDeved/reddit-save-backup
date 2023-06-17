@@ -69,7 +69,7 @@ async function uploadFile (name: string, file?: any) {
   }
 
   const channel = await getChannel()
-  const readStream = createReadStream(filePath, { end: size })
+  const readStream = createReadStream(filePath, { end: size, autoClose: true })
   const message = await channel.send({ files: [new Discord.AttachmentBuilder(readStream, { name })] })
   const path = message.attachments.first()?.url
   if (!path) throw new Error('attachment not found')
@@ -85,7 +85,7 @@ async function uploadFile (name: string, file?: any) {
 async function getRedditPosts () {
   const { children: posts1 } = await reddit.getUserSaved({ limit: 100 })
 
-  const ids = oldSaved.slice(70, 170)
+  const ids = oldSaved.slice(0, 100)
   const { children: posts2 } = await reddit.getPostInfos(ids)
 
   const posts = [...posts1, ...posts2]
