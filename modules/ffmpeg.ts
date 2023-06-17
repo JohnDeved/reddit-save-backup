@@ -1,13 +1,16 @@
 import Ffmpeg from 'fluent-ffmpeg'
 import ffmpegPath from 'ffmpeg-static'
+import ffprobe from 'ffprobe-static'
 import { stat } from 'fs/promises'
 
 if (ffmpegPath) Ffmpeg.setFfmpegPath(ffmpegPath)
+if (ffprobe.path) Ffmpeg.setFfprobePath(ffprobe.path)
 
-async function logDiff (oPath: string, cPath: string) {
+async function logDiff (oPath: string, cPath: string, bitrate?: number) {
   const { size: oSize } = await stat(oPath)
   const { size: cSize } = await stat(cPath)
   const sizeDiff = Math.round((oSize - cSize) / oSize * 100)
+  if (bitrate) console.log(`bitrate: ${bitrate}kb`)
   console.log(`compressed new video size: ${cSize} bytes`)
   console.log(`compressed old video size: ${oSize} bytes`)
   console.log(`compressed video size: ${sizeDiff}% smaller than original`)
@@ -34,20 +37,22 @@ export async function compressMedia (filePath: string) {
 
     if (!duration) throw new Error('cannot get video duration')
 
-    const bitrate = Math.round(25 * 1024 * 1024 / duration)
+    // bitrate in kb
+    const bitrate = Math.floor(20 * 1024 * 8 / duration)
     const outPath = filePath.replace(/_c\.mp4/, '_cl.mp4') // cl = compressed lossy
     return new Promise<string>((resolve, reject) => {
       ffmpeg.input(filePath)
         .on('end', async () => {
-          await logDiff(filePath, outPath)
+          await logDiff(filePath, outPath, bitrate)
           resolve(outPath)
         })
         .on('error', reject)
-        .videoBitrate(bitrate)
         .outputFormat('mp4')
+        // max bitrate
+        .addOption('-maxrate', `${bitrate}k`)
+        .addOption('-bufsize', `${bitrate * 2}k`)
         // min scale 720p
-        .videoFilters('scale=\'min(1280,iw)\':-2')
-        // why -2 instead of -1?
+        .addOption('-vf', 'scale=min(1280\\, iw):-2')
         .save(outPath)
     })
   }

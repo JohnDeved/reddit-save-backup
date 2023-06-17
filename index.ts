@@ -74,7 +74,7 @@ async function uploadFile (name: string, file?: any): Promise<{ path: string, id
 
   if (cached) {
     // bypass compressed files for now
-    if (!filePath.endsWith('_c.mp4')) {
+    if (!filePath.endsWith('_c.mp4') && !filePath.endsWith('_cl.mp4')) {
       // throw error until wierd upload bug is fixed
       throw new Error(`file upload aborted ${filePath}`)
     }
