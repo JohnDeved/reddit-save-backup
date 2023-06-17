@@ -45,7 +45,7 @@ class Downloader {
   }
 
   download (url: string) {
-    const { hostname } = new URL(url)
+    const { hostname, pathname } = new URL(url)
 
     if (hostname.endsWith('imgur.com')) return this.imgur(url)
     if (hostname === 'i.redd.it') return this.direct(url)
@@ -54,6 +54,10 @@ class Downloader {
     if (hostname.endsWith('redgifs.com')) return this.gfycat(url)
     if (hostname.endsWith('gfycat.com')) return this.gfycat(url)
     if (hostname === 'konachan.com') return this.direct(url)
+
+    if (hostname === 'www.reddit.com' && pathname.includes('/comments/')) {
+      throw new Error(`post seems to be removed by reddit mods ${url}`)
+    }
 
     throw new Error(`unsupported URL ${hostname} ${url}`)
   }
