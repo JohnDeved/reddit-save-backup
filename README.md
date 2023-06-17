@@ -15,3 +15,4 @@
   - cloudflare pages limit 500 builds per month
   - unlimited bandwidth
   - 25mb per file asset, hosted by cloudflare cdn, 20k files per project (might also be a way to host the images)
+  - github oauth login for admin control, to delete & commit entries
