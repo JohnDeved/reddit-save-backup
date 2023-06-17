@@ -6,6 +6,7 @@ import z from 'zod'
 import { config } from './modules/config'
 import { downloader } from './modules/downloader'
 import { Reddit } from './modules/reddit'
+import { compressMedia } from './modules/ffmpeg'
 // import Ffmpeg from 'fluent-ffmpeg'
 // const ffmpeg = Ffmpeg()
 
@@ -40,7 +41,7 @@ async function getChannel () {
   return channel
 }
 
-async function uploadFile (name: string, file?: any) {
+async function uploadFile (name: string, file?: any): Promise<{ path: string, id: string, url: string }> {
   const filePath = `./media/${name}`
   // check if file exists
   let cached = false
@@ -51,7 +52,7 @@ async function uploadFile (name: string, file?: any) {
   } else {
     // kill stream
     console.log(`using cached file ${filePath}`)
-    file.cancel()
+    // file.cancel()
     cached = true
   }
   // get file size
@@ -59,20 +60,28 @@ async function uploadFile (name: string, file?: any) {
 
   // check if file is bigger than 25mb
   if (size > 25 * 1024 * 1024) {
-    throw new Error(`file is bigger than 25mb ${filePath}`)
+    console.log(`file is bigger than 25mb ${filePath}, trying to compress`)
+    const compPath = await compressMedia(filePath)
+    const compName = compPath.split('/').pop()
+    if (!compName) throw new Error('no compressed name')
+    return uploadFile(compName)
   }
 
   // check if file is smaller than 8kb
   if (size < 8 * 1024) {
-    throw new Error(`file is smaller than 8kb ${filePath}`)
+    throw new Error(`file is smaller than 8kb ${filePath}, there must be something wrong`)
   }
 
   if (cached) {
-    throw new Error(`file upload aborted ${filePath}`)
+    // bypass compressed files for now
+    if (!filePath.endsWith('_c.mp4')) {
+      // throw error until wierd upload bug is fixed
+      throw new Error(`file upload aborted ${filePath}`)
+    }
   }
 
   const channel = await getChannel()
-  const readStream = createReadStream(filePath, { end: size, autoClose: true })
+  const readStream = createReadStream(filePath)
   const message = await channel.send({ files: [new Discord.AttachmentBuilder(readStream, { name })] })
   const path = message.attachments.first()?.url
   if (!path) throw new Error('attachment not found')
