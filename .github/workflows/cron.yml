@@ -22,5 +22,5 @@ jobs:
       - name: Commit files
         run: |
           git add .
-          git commit -m "Commit message"
+          git commit -m "~ run"
           git push
