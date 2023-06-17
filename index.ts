@@ -198,4 +198,3 @@ discord.login(config.DISCORD_TOKEN)
     console.log(issuePosts.sort((a, b) => a.err.localeCompare(b.err)))
     console.log(`https://www.reddit.com/api/info?id=${issuePosts.map(i => i.id).join(',')}`)
   })
-// get all guilds
