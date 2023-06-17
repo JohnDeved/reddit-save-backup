@@ -97,6 +97,7 @@ export class Reddit {
         kind: z.literal('t3'),
         data: z.object({
           id: z.string(),
+          created: z.number(),
           title: z.string(),
           name: z.string(),
           permalink: z.string(),

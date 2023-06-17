@@ -26,6 +26,7 @@ const stored = z.array(z.object({
   cdnUrl: z.string().url().or(z.array(z.string().url())),
   msgId: z.string().or(z.array(z.string())),
   msgUrl: z.string().or(z.array(z.string())),
+  created: z.number(),
 })).parse(JSON.parse(readFileSync('./stored.json', 'utf8')))
 
 let oldSaved = z.array(z.string()).parse(JSON.parse(readFileSync('./old.saved.json', 'utf8')))
@@ -42,6 +43,7 @@ async function uploadFile (name: string, file?: any) {
   if (!existsSync(filePath)) {
     const writeStream = createWriteStream(filePath)
     await pipeline(file, writeStream)
+    console.log(`downloaded file ${filePath}`)
   } else {
     // kill stream
     console.log(`using cached file ${filePath}`)
@@ -61,7 +63,7 @@ async function uploadFile (name: string, file?: any) {
   }
 
   const channel = await getChannel()
-  const readStream = createReadStream(filePath)
+  const readStream = createReadStream(filePath, { end: size })
   const message = await channel.send({ files: [new Discord.AttachmentBuilder(readStream, { name })] })
   const path = message.attachments.first()?.url
   if (!path) throw new Error('attachment not found')
@@ -140,6 +142,7 @@ async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>)
         cdnUrl: cdnUrls,
         msgId: msgIds,
         msgUrl: msgUrls,
+        created: saved.created,
       })
       await writeFile('./stored.json', JSON.stringify(stored, null, 2))
     } else {
@@ -155,6 +158,7 @@ async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>)
           cdnUrl: upload.path,
           msgId: upload.id,
           msgUrl: upload.url,
+          created: saved.created,
         })
         await writeFile('./stored.json', JSON.stringify(stored, null, 2))
       } catch (error) {
