@@ -47,14 +47,12 @@ class Downloader {
   download (url: string) {
     const { hostname } = new URL(url)
 
-    if (hostname === 'imgur.com') return this.direct(url)
-    if (hostname === 'i.imgur.com') return this.imgur(url)
+    if (hostname.endsWith('imgur.com')) return this.imgur(url)
     if (hostname === 'i.redd.it') return this.direct(url)
     if (hostname === 'files.catbox.moe') return this.direct(url)
     if (hostname === 'cdn.awwni.me') return this.direct(url)
-    if (hostname === 'www.redgifs.com') return this.gfycat(url)
-    if (hostname === 'redgifs.com') return this.gfycat(url)
-    if (hostname === 'gfycat.com') return this.gfycat(url)
+    if (hostname.endsWith('redgifs.com')) return this.gfycat(url)
+    if (hostname.endsWith('gfycat.com')) return this.gfycat(url)
     if (hostname === 'konachan.com') return this.direct(url)
 
     throw new Error(`unsupported URL ${hostname} ${url}`)
