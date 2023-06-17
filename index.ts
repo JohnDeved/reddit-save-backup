@@ -6,7 +6,10 @@ import z from 'zod'
 import { config } from './modules/config'
 import { downloader } from './modules/downloader'
 import { Reddit } from './modules/reddit'
+// import Ffmpeg from 'fluent-ffmpeg'
+// const ffmpeg = Ffmpeg()
 
+// ffmpeg.input()
 const reddit = new Reddit(config.CLIENT_ID, config.CLIENT_SECRET, config.REDDIT_USERNAME, config.REDDIT_PASSWORD)
 
 const discord = new Discord.Client({

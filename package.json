@@ -23,8 +23,12 @@
     "cheerio": "^1.0.0-rc.12",
     "discord.js": "^14.11.0",
     "dotenv": "^16.1.4",
+    "fluent-ffmpeg": "^2.1.2",
     "ts-node": "^10.9.1",
     "undici": "^5.22.1",
     "zod": "^3.21.4"
+  },
+  "devDependencies": {
+    "@types/fluent-ffmpeg": "^2.1.21"
   }
 }
