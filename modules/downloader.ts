@@ -1,12 +1,14 @@
 import { load as loadHtml } from 'cheerio'
 import { fetch } from 'undici'
 
+const directExt = ['jpg', 'jpeg', 'png', 'gif', 'mp4']
+
 class Downloader {
   direct (url: string) {
     const regex = /\.(\w{3,4})(\?.*)?$/
     const ext = url.match(regex)?.[1]
     if (!ext) throw new Error(`direct unexpected URL ${url}`)
-    if (!['jpg', 'png', 'gif', 'mp4'].includes(ext)) throw new Error(`direct unsupported extension ${ext}`)
+    if (!directExt.includes(ext)) throw new Error(`direct unsupported extension ${ext}`)
 
     return fetch(url)
       .then(response => {
@@ -21,7 +23,7 @@ class Downloader {
     const regex = /\.(\w{3,4})(\?.*)?$/
     const extension = url.match(regex)?.[1]
     if (!extension) throw new Error(`imgur unexpected URL ${url}`)
-    if (!['jpg', 'png', 'gifv', 'gif'].includes(extension)) throw new Error(`imgur unsupported extension ${extension}`)
+    if (!['jpg', 'jpeg', 'png', 'gifv', 'gif'].includes(extension)) throw new Error(`imgur unsupported extension ${extension}`)
 
     let ext = extension
     if (ext === 'gifv') {
@@ -54,6 +56,7 @@ class Downloader {
     if (hostname.endsWith('redgifs.com')) return this.gfycat(url)
     if (hostname.endsWith('gfycat.com')) return this.gfycat(url)
     if (hostname === 'konachan.com') return this.direct(url)
+    if (directExt.some(ext => pathname.endsWith(`.${ext}`))) return this.direct(url)
 
     if (hostname === 'www.reddit.com' && pathname.includes('/comments/')) {
       throw new Error(`post seems to be removed by reddit mods ${url}`)

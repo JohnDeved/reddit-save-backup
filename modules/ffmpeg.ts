@@ -72,5 +72,5 @@ export async function compressMedia (filePath: string) {
     })
   }
 
-  throw new Error('unknown file type, cannot convert')
+  throw new Error(`unknown file type, cannot convert ${filePath}`)
 }
