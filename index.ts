@@ -7,6 +7,7 @@ import { config } from './modules/config'
 import { downloader } from './modules/downloader'
 import { Reddit } from './modules/reddit'
 import { compressMedia } from './modules/compress'
+import { getMediaResolution } from './modules/mediaResolution'
 // import Ffmpeg from 'fluent-ffmpeg'
 // const ffmpeg = Ffmpeg()
 
@@ -31,6 +32,8 @@ const stored = z.array(z.object({
   msgId: z.string().or(z.array(z.string())),
   msgUrl: z.string().or(z.array(z.string())),
   created: z.number(),
+  height: z.number(),
+  width: z.number(),
 })).parse(JSON.parse(readFileSync('./stored.json', 'utf8')))
 
 let oldSaved = z.array(z.string()).parse(JSON.parse(readFileSync('./old.saved.json', 'utf8')))
@@ -41,7 +44,7 @@ async function getChannel () {
   return channel
 }
 
-async function uploadFile (name: string, file?: any): Promise<{ path: string, id: string, url: string }> {
+async function uploadFile (name: string, file?: any): Promise<{ filePath: string, path: string, id: string, url: string }> {
   const filePath = `./media/${name}`
   // check if file exists
   let cached = false
@@ -86,8 +89,9 @@ async function uploadFile (name: string, file?: any): Promise<{ path: string, id
   const path = message.attachments.first()?.url
   if (!path) throw new Error('attachment not found')
 
-  await unlink(filePath)
+  // await unlink(filePath)
   return {
+    filePath,
     path: path,
     id: message.id,
     url: message.url,
@@ -133,6 +137,8 @@ async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>)
       const cdnUrls: string[] = []
       const msgIds: string[] = []
       const msgUrls: string[] = []
+      let height = 0
+      let width = 0
       for (const { media_id } of saved.gallery_data.items) {
         const index = saved.gallery_data.items.findIndex(item => item.media_id === media_id)
         const media = saved.media_metadata[media_id]
@@ -143,6 +149,11 @@ async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>)
           console.log('downloading', media_id, url)
           const file = await downloader.download(url)
           const upload = await uploadFile(`${saved.name}.${index}.${file.ext}`, file.stream)
+          if (index === 0) {
+            const res = await getMediaResolution(upload.filePath)
+            height = res.height
+            width = res.width
+          }
           orgUrls.push(url)
           cdnUrls.push(upload.path)
           msgIds.push(upload.id)
@@ -160,6 +171,8 @@ async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>)
         msgId: msgIds,
         msgUrl: msgUrls,
         created: saved.created,
+        height,
+        width,
       })
       await writeFile('./stored.json', JSON.stringify(stored, null, 2))
     } else {
@@ -167,6 +180,7 @@ async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>)
         console.log('downloading', saved.name, saved.url)
         const file = await downloader.download(saved.url)
         const upload = await uploadFile(`${saved.name}.${file.ext}`, file.stream)
+        const { height, width } = await getMediaResolution(upload.filePath)
         stored.push({
           id: saved.id,
           title: saved.title,
@@ -176,6 +190,8 @@ async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>)
           msgId: upload.id,
           msgUrl: upload.url,
           created: saved.created,
+          height,
+          width,
         })
         await writeFile('./stored.json', JSON.stringify(stored, null, 2))
       } catch (error) {
