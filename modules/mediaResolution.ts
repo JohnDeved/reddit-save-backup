@@ -5,12 +5,15 @@ export function getMediaResolution (filePath: string): Promise<{ width: number, 
   return new Promise((resolve, reject) => ffmpeg.input(filePath).ffprobe((err, data) => {
     ffmpeg.kill('SIGKILL')
     if (err) return reject(err)
-    if (!data.streams[0]) return reject(new Error('getMediaResolution: no streams'))
-    if (!data.streams[0].width || !data.streams[0].height) return reject(new Error('getMediaResolution: no resolution'))
+
+    // get first stream with resolution
+    const stream = data.streams.find(s => s.width && s.height)
+    if (!stream) return reject(new Error(`getMediaResolution: no streams ${filePath}`))
+    if (!stream.width || !stream.height) return reject(new Error(`getMediaResolution: no resolution ${filePath}`))
 
     resolve({
-      width: data.streams[0].width,
-      height: data.streams[0].height,
+      width: stream.width,
+      height: stream.height,
     })
   }))
 }
