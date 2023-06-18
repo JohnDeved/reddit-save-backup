@@ -1,6 +1,6 @@
 {
-  "count": 38,
-  "listing": "https://www.reddit.com/api/info?id=t3_iabkxo,t3_go0i96,t3_gmqg03,t3_gpuppb,t3_gpqmjj,t3_gn69zu,t3_gpuiwd,t3_gpty7d,t3_jy5q7h,t3_gn9u2v,t3_gwvbws,t3_gnz5vx,t3_gn7v2g,t3_gxby8k,t3_lj7gqk,t3_gmvf9o,t3_gmz2pn,t3_gn2wwr,t3_h0mpje,t3_gmollc,t3_jigoif,t3_gn6bdy,t3_gu0bpk,t3_gn7ak7,t3_gn6ki4,t3_go19iz,t3_gn9z30,t3_go0ove,t3_gn9vxy,t3_14b6z3a,t3_ibks0v,t3_jcs0im,t3_juczc7,t3_jys0nv,t3_gn6kzn,t3_gnacn2,t3_gn8vgi,t3_lh448b",
+  "count": 36,
+  "listing": "https://www.reddit.com/api/info?id=t3_iabkxo,t3_go0i96,t3_gmqg03,t3_gpuppb,t3_gpqmjj,t3_gn69zu,t3_gpuiwd,t3_gpty7d,t3_jy5q7h,t3_gn9u2v,t3_gwvbws,t3_gnz5vx,t3_gn7v2g,t3_gxby8k,t3_gmvf9o,t3_gmz2pn,t3_gn2wwr,t3_h0mpje,t3_gmollc,t3_jigoif,t3_gn6bdy,t3_gu0bpk,t3_gn7ak7,t3_gn6ki4,t3_go19iz,t3_gn9z30,t3_go0ove,t3_gn9vxy,t3_14b6z3a,t3_ibks0v,t3_jcs0im,t3_juczc7,t3_jys0nv,t3_gn6kzn,t3_gnacn2,t3_gn8vgi",
   "posts": [
     {
       "err": "fetch failed",
@@ -57,10 +57,6 @@
     {
       "err": "Invalid URL",
       "id": "t3_gxby8k"
-    },
-    {
-      "err": "Request aborted",
-      "id": "t3_lj7gqk"
     },
     {
       "err": "unknown file type, cannot convert ./media/t3_gmvf9o.png",
@@ -149,10 +145,6 @@
     {
       "err": "unsupported URL www.youporn.com https://www.youporn.com/watch/15318609/brunette-cutie-mila-is-addicted-to-anal-crempie-part-2/?utm_source=chimcanhcut&amp;utm_medium=PT&amp;utm_campaign=chimcanhcut",
       "id": "t3_gn8vgi"
-    },
-    {
-      "err": "write EPIPE",
-      "id": "t3_lh448b"
     }
   ]
 }
