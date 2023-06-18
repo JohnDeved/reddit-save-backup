@@ -22,6 +22,8 @@ jobs:
           npm start
       - name: Commit files
         run: |
+          git config --local user.email "johann@objekt.stream"
+          git config --local user.name "undefined runner"
           git add .
           git commit -m "~ run"
           git push
