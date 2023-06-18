@@ -24,7 +24,8 @@ jobs:
           node-version: 19.x
       - name: "npm install and start"
         run: |
-          echo ${{ secrets.ENV }} > .env
+          echo "${{ secrets.ENV_FILE }}" > .env
+          cat .env
           npm install
           npm start
       - name: Commit files
