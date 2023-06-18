@@ -22,8 +22,9 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 19.x
-      - name: npm install and start
+      - name: "npm install and start"
         run: |
+          echo ${{ secrets.ENV }} > .env
           npm install
           npm start
       - name: Commit files
