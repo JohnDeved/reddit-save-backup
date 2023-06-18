@@ -22,7 +22,7 @@ async function check () {
         name: entry.name,
       }
     }
-    return entry.cdnUrl.map((url, i) => ({
+    return entry.cdnUrl.map(url => ({
       url,
       name: entry.name,
     }))
