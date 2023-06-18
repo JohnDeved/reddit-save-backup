@@ -5,7 +5,7 @@ import pLimit from 'p-limit'
 import bytes from 'bytes'
 import { writeFileSync } from 'fs'
 
-async function fetchRetry (url: Parameters<typeof fetch>[0], options?: Parameters<typeof fetch>[1]): ReturnType<typeof fetch> {
+async function fetchRetry (url: Parameters<typeof fetch>[0], options?: Parameters<typeof fetch>[1]) {
   try {
     return await fetch(url, options)
   } catch (err) {

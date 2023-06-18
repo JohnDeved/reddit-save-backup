@@ -1,6 +1,6 @@
-import Ffmpeg from 'fluent-ffmpeg'
 import ffmpegPath from 'ffmpeg-static'
 import ffprobe from 'ffprobe-static'
+import Ffmpeg from 'fluent-ffmpeg'
 import { stat } from 'fs/promises'
 
 if (ffmpegPath) Ffmpeg.setFfmpegPath(ffmpegPath)
