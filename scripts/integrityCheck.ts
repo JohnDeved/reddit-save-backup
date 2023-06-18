@@ -14,6 +14,7 @@ async function fetchRetry (url: Parameters<typeof fetch>[0], options?: Parameter
   }
 }
 
+check()
 async function check () {
   const entries = stored.flatMap(entry => {
     if (!Array.isArray(entry.cdnUrl)) {
@@ -60,5 +61,3 @@ async function check () {
   const newOldSaved = [...failedIds, ...oldSaved]
   writeFileSync('./old.saved.json', JSON.stringify(newOldSaved, null, 2))
 }
-
-check()

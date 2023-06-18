@@ -6,7 +6,7 @@ import z from 'zod'
 import { config } from './modules/config'
 import { downloader } from './modules/downloader'
 import { Reddit } from './modules/reddit'
-import { compressMedia } from './modules/ffmpeg'
+import { compressMedia } from './modules/compress'
 // import Ffmpeg from 'fluent-ffmpeg'
 // const ffmpeg = Ffmpeg()
 
