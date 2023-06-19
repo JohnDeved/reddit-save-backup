@@ -1,10 +1,5 @@
 {
-  "count": 1,
-  "listing": "https://www.reddit.com/api/info?id=t3_xx6oll",
-  "posts": [
-    {
-      "err": "ffmpeg exited with code 1: Conversion failed!\n",
-      "id": "t3_xx6oll"
-    }
-  ]
+  "count": 0,
+  "listing": "https://www.reddit.com/api/info?id=",
+  "posts": []
 }
