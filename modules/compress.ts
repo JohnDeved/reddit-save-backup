@@ -53,7 +53,7 @@ export async function compressMedia (filePath: string) {
         .addOption('-maxrate', `${bitrate}k`)
         .addOption('-bufsize', `${bitrate * 2}k`)
         // min scale 720p
-        .addOption('-vf', 'scale=min(1280\\, iw):-2')
+        .addOption('-vf', "scale='if(gt(iw,ih),1280,-1):if(gt(iw,ih),-1,1280)")
         .save(outPath)
     })
   }
@@ -70,6 +70,26 @@ export async function compressMedia (filePath: string) {
         })
         .on('error', reject)
         .outputFormat('mp4')
+        .save(outPath)
+    })
+  }
+
+  // check if is image
+  if (filePath.endsWith('.jpg') || filePath.endsWith('.jpeg') || filePath.endsWith('.png')) {
+    // image downscale to 1080p
+    return new Promise<string>((resolve, reject) => {
+      const outPath = filePath.replace(/\.(jpg|jpeg|png)/, '_c.jpg') // c = compressed
+      ffmpeg.input(filePath)
+        .on('end', async () => {
+          await logDiff(filePath, outPath)
+          resolve(outPath)
+          ffmpeg.kill('SIGKILL')
+        })
+        .on('error', reject)
+        .outputFormat('jpg')
+        // min scale 1080p
+        .addOption('-vf', "scale='if(gt(iw,ih),1920,-1):if(gt(iw,ih),-1,1920)")
+        .addOption('-update', '1')
         .save(outPath)
     })
   }
