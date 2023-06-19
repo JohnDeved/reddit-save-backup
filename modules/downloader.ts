@@ -50,12 +50,8 @@ class Downloader {
     const { hostname, pathname } = new URL(url)
 
     if (hostname.endsWith('imgur.com')) return this.imgur(url)
-    if (hostname === 'i.redd.it') return this.direct(url)
-    if (hostname === 'files.catbox.moe') return this.direct(url)
-    if (hostname === 'cdn.awwni.me') return this.direct(url)
     if (hostname.endsWith('redgifs.com')) return this.gfycat(url)
     if (hostname.endsWith('gfycat.com')) return this.gfycat(url)
-    if (hostname === 'konachan.com') return this.direct(url)
     if (directExt.some(ext => pathname.endsWith(`.${ext}`))) return this.direct(url)
 
     if (hostname === 'www.reddit.com' && pathname.includes('/comments/')) {
