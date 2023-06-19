@@ -134,9 +134,10 @@ async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>)
     }
     if (saved.url.includes('www.reddit.com/gallery/')) {
       const galleryId = saved.url.split('/').pop()
-      if (!galleryId) throw new Error('no gallery id')
-      const response = await reddit.getPostInfos([galleryId])
-      saved = response.children[0].data
+      if (galleryId) {
+        const response = await reddit.getPostInfos([galleryId])
+        saved = response.children[0].data
+      }
     }
     if (saved.gallery_data && saved.media_metadata) {
       const orgUrls: string[] = []
