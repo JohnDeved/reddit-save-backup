@@ -53,7 +53,7 @@ export async function compressMedia (filePath: string) {
         .addOption('-maxrate', `${bitrate}k`)
         .addOption('-bufsize', `${bitrate * 2}k`)
         // min scale 720p
-        .addOption('-vf', "scale='if(gt(iw,ih),1280,-1):if(gt(iw,ih),-1,1280)")
+        .addOption('-vf', "scale='if(gt(iw,ih),1280,-2):if(gt(iw,ih),-2,1280)")
         .save(outPath)
     })
   }
