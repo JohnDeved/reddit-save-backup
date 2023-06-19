@@ -19,13 +19,24 @@ class Downloader {
       .then(stream => ({ stream, ext }))
   }
 
-  imgur (url: string) {
+  imgur (url: string): ReturnType<typeof this.direct> {
     const regex = /\.(\w{3,4})(\?.*)?$/
-    const extension = url.match(regex)?.[1]
-    if (!extension) throw new Error(`imgur unexpected URL ${url}`)
-    if (!['jpg', 'jpeg', 'png', 'gifv', 'gif'].includes(extension)) throw new Error(`imgur unsupported extension ${extension}`)
+    let ext = url.match(regex)?.[1]
+    if (!ext) {
+      // get imageURL from og:image
+      return fetch(url)
+        .then(response => response.text())
+        .then(html => {
+          const $ = loadHtml(html)
+          const imageUrl = $('meta[property="og:image"]').attr('content')
+          if (!imageUrl) throw new Error(`imgur og:image not found (removed) ${url}`)
+          return imageUrl
+        })
+        .then(this.imgur)
+    }
 
-    let ext = extension
+    if (!['jpg', 'jpeg', 'png', 'gifv', 'gif'].includes(ext)) throw new Error(`imgur unsupported extension ${ext}`)
+
     if (ext === 'gifv') {
       url = url.replace(regex, '.mp4')
       ext = 'mp4'
