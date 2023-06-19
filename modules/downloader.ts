@@ -32,6 +32,13 @@ class Downloader {
 
         throw new Error(`og:video or og:image not found (remove) ${url}`)
       })
+      .then(url => {
+        // strip everything after ?
+        const regex = /^(.*?)(\?.*)?$/
+        const match = url.match(regex)?.[1]
+        if (!match) throw new Error(`og:video or og:image unexpected URL ${url}`)
+        return match
+      })
       .then(this.direct)
   }
 
