@@ -75,13 +75,13 @@ async function uploadFile (name: string, file?: any): Promise<{ filePath: string
     throw new Error(`file is smaller than 8kb ${filePath}, there must be something wrong`)
   }
 
-  if (cached) {
-    // bypass compressed files for now
-    if (!filePath.endsWith('_c.mp4') && !filePath.endsWith('_cl.mp4')) {
-      // throw error until wierd upload bug is fixed
-      throw new Error(`file upload aborted ${filePath}`)
-    }
-  }
+  // if (cached) {
+  //   // bypass compressed files for now
+  //   if (!filePath.endsWith('_c.mp4') && !filePath.endsWith('_cl.mp4')) {
+  //     // throw error until wierd upload bug is fixed
+  //     throw new Error(`file upload aborted ${filePath}`)
+  //   }
+  // }
 
   const channel = await getChannel()
   const readStream = createReadStream(filePath)
