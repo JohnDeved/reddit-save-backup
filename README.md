@@ -16,3 +16,7 @@
   - unlimited bandwidth
   - 25mb per file asset, hosted by cloudflare cdn, 20k files per project (might also be a way to host the images)
   - github oauth login for admin control, to delete & commit entries
+  - image zoom https://www.npmjs.com/package/react-medium-image-zoom
+  - gallery posts https://www.npmjs.com/package/swiper
+  - masonry https://mui.com/material-ui/react-image-list/
+  - virtualized list https://mui.com/components/lists/#virtualized-list

@@ -126,7 +126,7 @@ async function handleDownloadError (saved: any, error: unknown) {
 }
 
 async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>) {
-  for (let { data: saved } of posts) {
+  for (const { data: saved } of posts) {
     if (stored.find(item => item.id === saved.id)) {
       console.log('already saved', saved.name)
       await reddit.setUserUnsaved(saved.name)
@@ -137,7 +137,9 @@ async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>)
       if (galleryId) {
         const response = await reddit.getPostInfos([`t3_${galleryId}`])
         if (response.children.length !== 0) {
-          saved = response.children[0].data
+          const galleryPost = response.children[0].data
+          saved.gallery_data = galleryPost.gallery_data
+          saved.media_metadata = galleryPost.media_metadata
         }
       }
     }
