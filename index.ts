@@ -135,7 +135,7 @@ async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>)
     if (saved.url.includes('www.reddit.com/gallery/')) {
       const galleryId = saved.url.split('/').pop()
       if (galleryId) {
-        const response = await reddit.getPostInfos([galleryId])
+        const response = await reddit.getPostInfos([`t3_${galleryId}`])
         saved = response.children[0].data
       }
     }
