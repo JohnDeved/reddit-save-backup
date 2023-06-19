@@ -86,7 +86,7 @@ export async function compressMedia (filePath: string) {
           ffmpeg.kill('SIGKILL')
         })
         .on('error', reject)
-        .outputFormat('jpg')
+        .outputFormat('mjpeg')
         // min scale 1080p
         .addOption('-vf', "scale='if(gt(iw,ih),1920,-1):if(gt(iw,ih),-1,1920)")
         .addOption('-update', '1')
