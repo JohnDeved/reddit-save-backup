@@ -104,12 +104,12 @@ export class Reddit {
           url: z.string(),
           media_metadata: z.record(z.string(), z.object({
             m: z.string(),
-          })).optional(),
+          })).nullable().optional(),
           gallery_data: z.object({
             items: z.array(z.object({
               media_id: z.string(),
             })),
-          }).optional(),
+          }).nullable().optional(),
           domain: z.string(),
         }),
       })),
