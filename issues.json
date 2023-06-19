@@ -1,41 +1,21 @@
 {
-  "count": 9,
-  "listing": "https://www.reddit.com/api/info?id=t3_iabkxo,t3_gn7v2g,t3_gxby8k,t3_srnjaj,t3_srnsto,t3_gmvf9o,t3_gmz2pn,t3_gn2wwr,t3_h0mpje",
+  "count": 4,
+  "listing": "https://www.reddit.com/api/info?id=t3_gmvf9o,t3_gmz2pn,t3_gn2wwr,t3_h0mpje",
   "posts": [
     {
-      "err": "fetch failed",
-      "id": "t3_iabkxo"
-    },
-    {
-      "err": "Invalid URL",
-      "id": "t3_gn7v2g"
-    },
-    {
-      "err": "Invalid URL",
-      "id": "t3_gxby8k"
-    },
-    {
-      "err": "Invalid URL",
-      "id": "t3_srnjaj"
-    },
-    {
-      "err": "Invalid URL",
-      "id": "t3_srnsto"
-    },
-    {
-      "err": "unknown file type, cannot convert ./media/t3_gmvf9o.png",
+      "err": "file upload aborted ./media/t3_gmvf9o_c.jpg",
       "id": "t3_gmvf9o"
     },
     {
-      "err": "unknown file type, cannot convert ./media/t3_gmz2pn.png",
+      "err": "file upload aborted ./media/t3_gmz2pn_c.jpg",
       "id": "t3_gmz2pn"
     },
     {
-      "err": "unknown file type, cannot convert ./media/t3_gn2wwr.png",
+      "err": "file upload aborted ./media/t3_gn2wwr_c.jpg",
       "id": "t3_gn2wwr"
     },
     {
-      "err": "unknown file type, cannot convert ./media/t3_h0mpje.png",
+      "err": "file upload aborted ./media/t3_h0mpje_c.jpg",
       "id": "t3_h0mpje"
     }
   ]
