@@ -111,8 +111,12 @@ async function getRedditPosts () {
 
 async function handleDownloadError (saved: any, error: unknown) {
   if (error instanceof Error) {
-    if (error.message.includes('removed')) {
-      console.log('seems to be removed', saved)
+    if (error.message.includes('remove')) {
+      if (error.message.includes('removed')) {
+        console.log('seems to be removed', saved)
+      } else {
+        console.log('removing', saved)
+      }
       oldSaved = oldSaved.filter(id => id !== saved.name)
       return reddit.setUserUnsaved(saved.name)
     }

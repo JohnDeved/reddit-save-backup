@@ -62,7 +62,7 @@ class Downloader {
       throw new Error(`post seems to be removed by reddit mods ${url}`)
     }
 
-    throw new Error(`unsupported URL ${hostname} ${url}`)
+    throw new Error(`unsupported URL (remove) ${hostname} ${url}`)
   }
 }
 
