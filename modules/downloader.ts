@@ -43,6 +43,7 @@ class Downloader {
   }
 
   async download (url: string) {
+    if (!url.startsWith('http')) throw new Error(`download unexpected URL (removed) ${url}`)
     const { pathname } = new URL(url)
     if (directExt.some(ext => pathname.endsWith(`.${ext}`))) return this.direct(url)
     return this.ogMeta(url)
