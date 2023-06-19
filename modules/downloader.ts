@@ -30,7 +30,7 @@ class Downloader {
         const imageUrl = $('meta[property="og:image"]').attr('content')
         if (imageUrl) return imageUrl
 
-        throw new Error(`og:video or og:image not found (remove) ${url}`)
+        throw new Error(`og:video or og:image not found (removed) ${url}`)
       })
       .then(url => {
         // strip everything after ?
