@@ -126,11 +126,17 @@ async function handleDownloadError (saved: any, error: unknown) {
 }
 
 async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>) {
-  for (const { data: saved } of posts) {
+  for (let { data: saved } of posts) {
     if (stored.find(item => item.id === saved.id)) {
       console.log('already saved', saved.name)
       await reddit.setUserUnsaved(saved.name)
       continue
+    }
+    if (saved.url.includes('www.reddit.com/gallery/')) {
+      const galleryId = saved.url.split('/').pop()
+      if (!galleryId) throw new Error('no gallery id')
+      const response = await reddit.getPostInfos([galleryId])
+      saved = response.children[0].data
     }
     if (saved.gallery_data && saved.media_metadata) {
       const orgUrls: string[] = []
