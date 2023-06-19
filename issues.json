@@ -1,10 +1,5 @@
 {
-  "count": 1,
-  "listing": "https://www.reddit.com/api/info?id=t3_10ccl1h",
-  "posts": [
-    {
-      "err": "terminated",
-      "id": "t3_10ccl1h"
-    }
-  ]
+  "count": 0,
+  "listing": "https://www.reddit.com/api/info?id=",
+  "posts": []
 }
