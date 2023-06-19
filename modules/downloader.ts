@@ -19,57 +19,26 @@ class Downloader {
       .then(stream => ({ stream, ext }))
   }
 
-  imgur (url: string): ReturnType<typeof this.direct> {
-    const regex = /\.(\w{3,4})(\?.*)?$/
-    let ext = url.match(regex)?.[1]
-    if (!ext) {
-      // get imageURL from og:image
-      return fetch(url)
-        .then(response => response.text())
-        .then(html => {
-          const $ = loadHtml(html)
-          const imageUrl = $('meta[property="og:image"]').attr('content')
-          if (!imageUrl) throw new Error(`imgur og:image not found (removed) ${url}`)
-          return imageUrl
-        })
-        .then(this.imgur)
-    }
-
-    if (!['jpg', 'jpeg', 'png', 'gifv', 'gif'].includes(ext)) throw new Error(`imgur unsupported extension ${ext}`)
-
-    if (ext === 'gifv') {
-      url = url.replace(regex, '.mp4')
-      ext = 'mp4'
-    }
-
-    return this.direct(url)
-  }
-
-  gfycat (url: string) {
+  ogMeta (url: string) {
     return fetch(url)
       .then(response => response.text())
       .then(html => {
         const $ = loadHtml(html)
+        // get og:video or og:image
         const videoUrl = $('meta[property="og:video"]').attr('content')
-        if (!videoUrl) throw new Error(`gfycat og:video not found (removed) ${url}`)
-        return videoUrl
+        if (videoUrl) return videoUrl
+        const imageUrl = $('meta[property="og:image"]').attr('content')
+        if (imageUrl) return imageUrl
+
+        throw new Error(`og:video or og:image not found (remove) ${url}`)
       })
       .then(this.direct)
   }
 
-  download (url: string) {
-    const { hostname, pathname } = new URL(url)
-
-    if (hostname.endsWith('imgur.com')) return this.imgur(url)
-    if (hostname.endsWith('redgifs.com')) return this.gfycat(url)
-    if (hostname.endsWith('gfycat.com')) return this.gfycat(url)
+  async download (url: string) {
+    const { pathname } = new URL(url)
     if (directExt.some(ext => pathname.endsWith(`.${ext}`))) return this.direct(url)
-
-    if (hostname === 'www.reddit.com' && pathname.includes('/comments/')) {
-      throw new Error(`post seems to be removed by reddit mods ${url}`)
-    }
-
-    throw new Error(`unsupported URL (remove) ${hostname} ${url}`)
+    return this.ogMeta(url)
   }
 }
 
