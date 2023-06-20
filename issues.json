@@ -1,10 +1,5 @@
 {
-  "count": 1,
-  "listing": "https://www.reddit.com/api/info?id=t3_iabkxo",
-  "posts": [
-    {
-      "err": "fetch failed",
-      "id": "t3_iabkxo"
-    }
-  ]
+  "count": 0,
+  "listing": "https://www.reddit.com/api/info?id=",
+  "posts": []
 }
