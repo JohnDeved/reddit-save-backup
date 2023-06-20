@@ -22,7 +22,7 @@ class Downloader {
   ogMeta (url: string) {
     return fetch(url)
       .then(response => {
-        if (response.status === 404) throw new Error(`ogMeta bad status (removed) ${url} ${response.status}`)
+        if ([404, 410].includes(response.status)) throw new Error(`ogMeta bad status (removed) ${url} ${response.status}`)
         if (!response.ok) throw new Error(`ogMeta unexpected status ${url} ${response.status}`)
         return response.text()
       })
