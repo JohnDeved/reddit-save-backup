@@ -12,7 +12,7 @@ class Downloader {
 
     return fetch(url)
       .then(response => {
-        if (!response.ok) throw new Error(`direct unexpected BODY (removed) ${url}`)
+        if (!response.ok) throw new Error(`direct unexpected BODY (removed) ${url} ${response.status}`)
         if (response.url.includes('removed')) throw new Error(`direct removed ${url}`)
         return response.body
       })
@@ -21,7 +21,11 @@ class Downloader {
 
   ogMeta (url: string) {
     return fetch(url)
-      .then(response => response.text())
+      .then(response => {
+        if (response.status === 404) throw new Error(`ogMeta bad status (removed) ${url} ${response.status}`)
+        if (!response.ok) throw new Error(`ogMeta unexpected status ${url} ${response.status}`)
+        return response.text()
+      })
       .then(html => {
         const $ = loadHtml(html)
         // get og:video or og:image
