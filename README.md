@@ -1,6 +1,6 @@
 # reddit-save-backup
 
-`npm i JohnDeved/reddit-save-backup`
+`npm i JohnDeved/reddit-save-backup` to install json
 
 - make use of github actions to scedule reddit api calls
   - no hosting required
