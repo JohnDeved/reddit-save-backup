@@ -1,10 +1,5 @@
 {
-  "count": 1,
-  "listing": "https://www.reddit.com/api/info?id=t3_14n9ubn",
-  "posts": [
-    {
-      "err": "file is smaller than 8kb ./media/t3_14n9ubn.jpg, there must be something wrong",
-      "id": "t3_14n9ubn"
-    }
-  ]
+  "count": 0,
+  "listing": "https://www.reddit.com/api/info?id=",
+  "posts": []
 }
