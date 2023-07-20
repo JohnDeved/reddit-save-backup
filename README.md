@@ -22,3 +22,10 @@
   - gallery posts https://www.npmjs.com/package/swiper
   - masonry https://mui.com/material-ui/react-image-list/
   - virtualized list https://mui.com/components/lists/#virtualized-list
+
+todo:
+  - convert images to progressive
+    - https://www.npmjs.com/package/sharp-cli
+    - https://www.npmjs.com/package/sharp
+    - https://sharp.pixelplumbing.com/api-output#jpeg
+    - npx sharp-cli -i in.jpg -p -q 100 -o out.jpg
