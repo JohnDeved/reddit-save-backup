@@ -1,5 +1,18 @@
 {
-  "count": 0,
-  "listing": "https://www.reddit.com/api/info?id=",
-  "posts": []
+  "count": 3,
+  "listing": "https://www.reddit.com/api/info?id=t3_155p1jk,t3_156hmnh,t3_15ajg97",
+  "posts": [
+    {
+      "err": "file is smaller than 8kb ./media/t3_155p1jk.jpg, there must be something wrong",
+      "id": "t3_155p1jk"
+    },
+    {
+      "err": "file is smaller than 8kb ./media/t3_156hmnh.jpg, there must be something wrong",
+      "id": "t3_156hmnh"
+    },
+    {
+      "err": "file is smaller than 8kb ./media/t3_15ajg97.jpg, there must be something wrong",
+      "id": "t3_15ajg97"
+    }
+  ]
 }
