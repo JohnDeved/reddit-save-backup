@@ -16,7 +16,7 @@ async function main () {
     if (existsSync(filePath)) continue
     const res = await fetch(url)
 
-    console.log(`downloading ${downloaded}/${urls.length} ${fileName}`)
+    console.log(`downloading ${downloaded}/${urls.length} ${fileName}`, 'at url', url)
     await pipeline(res.body as any, createWriteStream(filePath))
   }
 }
