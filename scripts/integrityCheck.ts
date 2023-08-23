@@ -66,12 +66,11 @@ async function check () {
   const backupPath = '/Users/johannberger/Library/CloudStorage/GoogleDrive-johann@objekt.stream/Shared drives/Backups/Saved'
 
   // if backup path exists
-
   if (existsSync(backupPath)) {
     for (const { contentLength, ok, url } of results) {
       if (!ok) continue
       const fileName = url.split('/').pop()
-      if (!fileName) return
+      if (!fileName) continue
       const filePath = `${backupPath}/${fileName}`
       const fileSize = Number(contentLength)
 
