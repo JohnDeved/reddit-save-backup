@@ -3,7 +3,8 @@ import stored from '../stored.json'
 import oldSaved from '../old.saved.json'
 import pLimit from 'p-limit'
 import bytes from 'bytes'
-import { writeFileSync } from 'fs'
+import { existsSync, writeFileSync } from 'fs'
+import { rm, stat } from 'fs/promises'
 
 async function fetchRetry (url: Parameters<typeof fetch>[0], options?: Parameters<typeof fetch>[1]) {
   try {
@@ -60,4 +61,27 @@ async function check () {
   // add to the beginning of old.saved.json
   const newOldSaved = [...failedIds, ...oldSaved]
   writeFileSync('./old.saved.json', JSON.stringify(newOldSaved, null, 2))
+
+  // check backup size
+  const backupPath = '/Users/johannberger/Library/CloudStorage/GoogleDrive-johann@objekt.stream/Shared drives/Backups/Saved'
+
+  // if backup path exists
+
+  if (existsSync(backupPath)) {
+    for (const { contentLength, ok, url } of results) {
+      if (!ok) continue
+      const fileName = url.split('/').pop()
+      if (!fileName) return
+      const filePath = `${backupPath}/${fileName}`
+      const fileSize = Number(contentLength)
+
+      const stats = await stat(filePath)
+      const backupFileSize = stats.size
+
+      if (fileSize !== backupFileSize) {
+        console.log(`file size mismatch ${fileSize} !== ${backupFileSize}`, 'at', filePath, 'removing file')
+        await rm(filePath)
+      }
+    }
+  }
 }
