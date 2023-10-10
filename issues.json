@@ -1,19 +1,7 @@
 {
-  "count": 4,
-  "listing": "https://www.reddit.com/api/info?id=t3_132s8yc,t3_134kj19,t3_135kvdk,t3_173wapk",
+  "count": 1,
+  "listing": "https://www.reddit.com/api/info?id=t3_173wapk",
   "posts": [
-    {
-      "err": "file is smaller than 8kb ./media/t3_132s8yc.jpg, there must be something wrong",
-      "id": "t3_132s8yc"
-    },
-    {
-      "err": "file is smaller than 8kb ./media/t3_134kj19.jpg, there must be something wrong",
-      "id": "t3_134kj19"
-    },
-    {
-      "err": "file is smaller than 8kb ./media/t3_135kvdk.jpg, there must be something wrong",
-      "id": "t3_135kvdk"
-    },
     {
       "err": "file is smaller than 8kb ./media/t3_173wapk.jpg, there must be something wrong",
       "id": "t3_173wapk"
