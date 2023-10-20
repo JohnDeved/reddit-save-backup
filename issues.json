@@ -1,6 +1,6 @@
 {
-  "count": 92,
-  "listing": "https://www.reddit.com/api/info?id=t3_132s8yc,t3_134kj19,t3_135kvdk,t3_13bndk1,t3_13i6fuj,t3_13lutjk,t3_13mq2w8,t3_14wpsop,t3_14yj3cq,t3_155p1jk,t3_15hanqq,t3_15jne0u,t3_15m8trm,t3_15npe4o,t3_15o6gz0,t3_15p3ogi,t3_15paty5,t3_15s3w7k,t3_15s4nkk,t3_15sn4yb,t3_15soy43,t3_15sqf8s,t3_15sxfjz,t3_15t9m16,t3_15uh59a,t3_15uhwuj,t3_15ujllh,t3_15uu7wl,t3_15vjaeu,t3_15vlvxc,t3_15x40v3,t3_15x9rsi,t3_15yhml1,t3_15zc42g,t3_16087dx,t3_164gr7z,t3_164sg25,t3_169q9ky,t3_16ce838,t3_16ceacj,t3_16cginf,t3_16d01f1,t3_16e4x1y,t3_16e4yiu,t3_16f1fja,t3_16fau19,t3_16ftll2,t3_16g1l3v,t3_16kxe1j,t3_16l4wdo,t3_16memkv,t3_16mhyy8,t3_16odw5l,t3_16qonli,t3_16qsh7q,t3_16r22jq,t3_16rmv0g,t3_16s0h5d,t3_16tj5c5,t3_16tnpsu,t3_16tp5s9,t3_16tqgtk,t3_16ttw35,t3_16tucap,t3_16tz4ps,t3_16v9wvi,t3_16xuzd0,t3_16xv3r4,t3_16xw0sg,t3_171pwic,t3_1725aqy,t3_173dmg2,t3_173ps7c,t3_173qm83,t3_173vzkr,t3_173w1da,t3_173wapk,t3_173wlzb,t3_173x9rh,t3_1744mho,t3_174js48,t3_174kkbt,t3_175vi0a,t3_1763xpw,t3_176oix2,t3_17848xr,t3_17878y8,t3_178do9b,t3_178hitw,t3_178hr7s,t3_178n8r5,t3_17a5rgb",
+  "count": 79,
+  "listing": "https://www.reddit.com/api/info?id=t3_132s8yc,t3_134kj19,t3_135kvdk,t3_13bndk1,t3_13i6fuj,t3_13lutjk,t3_13mq2w8,t3_14wpsop,t3_14yj3cq,t3_15o6gz0,t3_15p3ogi,t3_15s3w7k,t3_15s4nkk,t3_15soy43,t3_15uh59a,t3_15uhwuj,t3_15ujllh,t3_15vjaeu,t3_15x9rsi,t3_15yhml1,t3_15zc42g,t3_16087dx,t3_164gr7z,t3_164sg25,t3_169q9ky,t3_16ce838,t3_16ceacj,t3_16cginf,t3_16d01f1,t3_16e4x1y,t3_16e4yiu,t3_16f1fja,t3_16fau19,t3_16ftll2,t3_16g1l3v,t3_16kxe1j,t3_16l4wdo,t3_16memkv,t3_16mhyy8,t3_16odw5l,t3_16qonli,t3_16qsh7q,t3_16r22jq,t3_16rmv0g,t3_16s0h5d,t3_16tj5c5,t3_16tnpsu,t3_16tp5s9,t3_16tqgtk,t3_16ttw35,t3_16tucap,t3_16tz4ps,t3_16v9wvi,t3_16xuzd0,t3_16xv3r4,t3_16xw0sg,t3_171pwic,t3_1725aqy,t3_173dmg2,t3_173ps7c,t3_173qm83,t3_173vzkr,t3_173w1da,t3_173wapk,t3_173wlzb,t3_173x9rh,t3_1744mho,t3_174js48,t3_174kkbt,t3_175vi0a,t3_1763xpw,t3_176oix2,t3_17848xr,t3_17878y8,t3_178do9b,t3_178hitw,t3_178hr7s,t3_178n8r5,t3_17a5rgb",
   "posts": [
     {
       "err": "file is smaller than 8kb ./media/t3_132s8yc.jpg, there must be something wrong",
@@ -39,36 +39,12 @@
       "id": "t3_14yj3cq"
     },
     {
-      "err": "file is smaller than 8kb ./media/t3_155p1jk.jpg, there must be something wrong",
-      "id": "t3_155p1jk"
-    },
-    {
-      "err": "file is smaller than 8kb ./media/t3_15hanqq.jpg, there must be something wrong",
-      "id": "t3_15hanqq"
-    },
-    {
-      "err": "file is smaller than 8kb ./media/t3_15jne0u.jpg, there must be something wrong",
-      "id": "t3_15jne0u"
-    },
-    {
-      "err": "file is smaller than 8kb ./media/t3_15m8trm.jpg, there must be something wrong",
-      "id": "t3_15m8trm"
-    },
-    {
-      "err": "file is smaller than 8kb ./media/t3_15npe4o.jpg, there must be something wrong",
-      "id": "t3_15npe4o"
-    },
-    {
       "err": "file is smaller than 8kb ./media/t3_15o6gz0.jpg, there must be something wrong",
       "id": "t3_15o6gz0"
     },
     {
       "err": "file is smaller than 8kb ./media/t3_15p3ogi.jpg, there must be something wrong",
       "id": "t3_15p3ogi"
-    },
-    {
-      "err": "file is smaller than 8kb ./media/t3_15paty5.jpg, there must be something wrong",
-      "id": "t3_15paty5"
     },
     {
       "err": "file is smaller than 8kb ./media/t3_15s3w7k.jpg, there must be something wrong",
@@ -79,24 +55,8 @@
       "id": "t3_15s4nkk"
     },
     {
-      "err": "file is smaller than 8kb ./media/t3_15sn4yb.jpg, there must be something wrong",
-      "id": "t3_15sn4yb"
-    },
-    {
       "err": "file is smaller than 8kb ./media/t3_15soy43.jpg, there must be something wrong",
       "id": "t3_15soy43"
-    },
-    {
-      "err": "file is smaller than 8kb ./media/t3_15sqf8s.jpg, there must be something wrong",
-      "id": "t3_15sqf8s"
-    },
-    {
-      "err": "file is smaller than 8kb ./media/t3_15sxfjz.jpg, there must be something wrong",
-      "id": "t3_15sxfjz"
-    },
-    {
-      "err": "file is smaller than 8kb ./media/t3_15t9m16.jpg, there must be something wrong",
-      "id": "t3_15t9m16"
     },
     {
       "err": "file is smaller than 8kb ./media/t3_15uh59a.jpg, there must be something wrong",
@@ -111,20 +71,8 @@
       "id": "t3_15ujllh"
     },
     {
-      "err": "file is smaller than 8kb ./media/t3_15uu7wl.jpg, there must be something wrong",
-      "id": "t3_15uu7wl"
-    },
-    {
       "err": "file is smaller than 8kb ./media/t3_15vjaeu.jpg, there must be something wrong",
       "id": "t3_15vjaeu"
-    },
-    {
-      "err": "file is smaller than 8kb ./media/t3_15vlvxc.jpg, there must be something wrong",
-      "id": "t3_15vlvxc"
-    },
-    {
-      "err": "file is smaller than 8kb ./media/t3_15x40v3.jpg, there must be something wrong",
-      "id": "t3_15x40v3"
     },
     {
       "err": "file is smaller than 8kb ./media/t3_15x9rsi.jpg, there must be something wrong",
