@@ -15,19 +15,27 @@
 //   },
 // ]
 
+export interface Stored {
+  id: string
+  title: string
+  name: string
+  orgUrl: string
+  cdnUrl: string | string[]
+  msgId: string
+  msgUrl: string
+  created: number
+  height: number
+  width: number
+}
+
 declare module '*/stored.json' {
-  export interface Stored {
-    id: string
-    title: string
-    name: string
-    orgUrl: string
-    cdnUrl: string | string[]
-    msgId: string
-    msgUrl: string
-    created: number
-    height: number
-    width: number
-  }
+  export interface Stored extends Stored {}
+  const stored: Stored[]
+  export default stored
+}
+
+declare module '@undefined/saved' {
+  export interface Stored extends Stored {}
   const stored: Stored[]
   export default stored
 }
