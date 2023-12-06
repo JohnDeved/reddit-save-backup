@@ -1,5 +1,5 @@
 import oldSaved from '../old.saved.json'
-import stored from '../stored.json'
+import stored from '@undefined/saved'
 import fs from 'fs'
 
 // fetch info for old saves in batches of 100

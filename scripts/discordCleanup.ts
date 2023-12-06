@@ -1,6 +1,6 @@
 import Discord from 'discord.js'
 import { config } from '../modules/config'
-import stored from '../stored.json'
+import stored from '@undefined/saved'
 import pLimit from 'p-limit'
 
 const discord = new Discord.Client({

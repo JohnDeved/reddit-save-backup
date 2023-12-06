@@ -92,7 +92,7 @@ async function uploadFile (name: string, file?: any): Promise<{ filePath: string
   // await unlink(filePath)
   return {
     filePath,
-    path: path,
+    path,
     id: message.id,
     url: message.url,
   }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-confusing-void-expression */
 import Ffmpeg from '../modules/ffmpeg'
 
 export function getMediaResolution (filePath: string): Promise<{ width: number, height: number }> {

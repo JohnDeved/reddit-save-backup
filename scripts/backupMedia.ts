@@ -1,8 +1,9 @@
 import { pipeline } from 'stream/promises'
-import stored from '../stored.json'
+import stored from '@undefined/saved'
 import { createWriteStream, existsSync } from 'fs'
+import path from 'path'
 
-const backupPath = '/Users/johannberger/Library/CloudStorage/GoogleDrive-johann@objekt.stream/Shared drives/Backups/Saved'
+const backupPath = path.resolve(__dirname, '../media')
 
 main()
 async function main () {

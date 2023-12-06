@@ -1,5 +1,5 @@
 import { writeFileSync } from 'fs'
-import stored from '../stored.json'
+import stored from '@undefined/saved'
 
 // find dubplicates
 const duplicates = stored.filter((item, index, self) => self.findIndex(i => i.name === item.name) !== index)

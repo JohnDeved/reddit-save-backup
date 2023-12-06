@@ -1,10 +1,11 @@
 import { fetch } from 'undici'
-import stored from '../stored.json'
 import oldSaved from '../old.saved.json'
 import pLimit from 'p-limit'
 import bytes from 'bytes'
 import { existsSync, writeFileSync } from 'fs'
 import { rm, stat } from 'fs/promises'
+import path from 'path'
+import stored from '@undefined/saved'
 
 async function fetchRetry (url: Parameters<typeof fetch>[0], options?: Parameters<typeof fetch>[1]) {
   try {
@@ -63,7 +64,7 @@ async function check () {
   writeFileSync('./old.saved.json', JSON.stringify(newOldSaved, null, 2))
 
   // check backup size
-  const backupPath = '/Users/johannberger/Library/CloudStorage/GoogleDrive-johann@objekt.stream/Shared drives/Backups/Saved'
+  const backupPath = path.resolve(__dirname, '../media')
 
   // if backup path exists
   if (existsSync(backupPath)) {
@@ -74,6 +75,7 @@ async function check () {
       const filePath = `${backupPath}/${fileName}`
       const fileSize = Number(contentLength)
 
+      if (!existsSync(filePath)) continue
       const stats = await stat(filePath)
       const backupFileSize = stats.size
 
