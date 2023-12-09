@@ -1,6 +1,6 @@
 import { pipeline } from 'stream/promises'
 import stored from '@undefined/saved'
-import { createWriteStream, existsSync } from 'fs'
+import { createWriteStream, existsSync, rename, renameSync } from 'fs'
 import path from 'path'
 
 const backupPath = path.resolve(__dirname, '../media')
@@ -11,8 +11,20 @@ async function main () {
   let downloaded = 0
   for (const url of urls) {
     downloaded++
-    const fileName = url.split('/').pop()
+    let fileName = url.split('/').pop()
     if (!fileName) continue
+
+    if (fileName.includes('?')) {
+      const fileNameStrp = fileName.split('?').shift()!
+
+      if (existsSync(`${backupPath}/${fileName}`)) {
+        console.log('renaming', fileName, fileNameStrp)
+        renameSync(`${backupPath}/${fileName}`, `${backupPath}/${fileNameStrp}`)
+      }
+
+      fileName = fileNameStrp
+    }
+
     const filePath = `${backupPath}/${fileName}`
     if (existsSync(filePath)) continue
     const res = await fetch(url)
