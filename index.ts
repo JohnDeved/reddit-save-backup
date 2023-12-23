@@ -218,11 +218,11 @@ discord.login(config.DISCORD_TOKEN)
   .then(downloadPosts)
   .then(() => getPinnedClips(discord))
   .then(async (clips) => {
+    const channel = await getChannel()
     for (const clip of clips) {
       // send clip to channel
-      const channel = await getChannel()
       if (typeof clip.cdnUrl !== 'string') continue
-      channel.send(clip.cdnUrl)
+      await channel.send(clip.cdnUrl)
       stored.push(clip)
     }
   })
