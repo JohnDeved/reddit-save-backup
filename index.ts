@@ -8,6 +8,7 @@ import { downloader } from './modules/downloader'
 import { Reddit } from './modules/reddit'
 import { compressMedia } from './modules/compress'
 import { getMediaResolution } from './modules/mediaResolution'
+import { getPinnedClips } from './modules/clips'
 // import Ffmpeg from 'fluent-ffmpeg'
 // const ffmpeg = Ffmpeg()
 
@@ -23,7 +24,7 @@ const issuePosts: Array<{
   id: string
 }> = []
 
-const stored = z.array(z.object({
+export const stored = z.array(z.object({
   id: z.string(),
   title: z.string(),
   name: z.string(),
@@ -215,6 +216,16 @@ async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>)
 discord.login(config.DISCORD_TOKEN)
   .then(getRedditPosts)
   .then(downloadPosts)
+  .then(() => getPinnedClips(discord))
+  .then(async (clips) => {
+    for (const clip of clips) {
+      // send clip to channel
+      const channel = await getChannel()
+      if (typeof clip.cdnUrl !== 'string') continue
+      channel.send(clip.cdnUrl)
+      stored.push(clip)
+    }
+  })
   .then(async () => {
     oldSaved = oldSaved.filter(id => !stored.find(item => item.name === id))
     await writeFile('./old.saved.json', JSON.stringify(oldSaved, null, 2))
