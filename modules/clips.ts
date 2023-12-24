@@ -13,7 +13,10 @@ export async function getPinnedClips (discord: Discord.Client): Promise<typeof s
     if (!message.embeds[0]) continue
 
     // check if message is already stored by checking if it has a checkmark reaction
-    if (message.reactions.cache.get('✅')) continue
+    if (message.reactions.cache.get('✅')) {
+      await message.unpin()
+      continue
+    }
 
     clipsAsStored.push({
       created: message.createdTimestamp,
