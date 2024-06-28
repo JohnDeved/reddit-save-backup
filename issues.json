@@ -1,10 +1,5 @@
 {
-  "count": 1,
-  "listing": "https://www.reddit.com/api/info?id=t3_1dnzvuh",
-  "posts": [
-    {
-      "err": "ogMeta unexpected status https://www.redgifs.com/watch/singleblacknewtnutria 451",
-      "id": "t3_1dnzvuh"
-    }
-  ]
+  "count": 0,
+  "listing": "https://www.reddit.com/api/info?id=",
+  "posts": []
 }
