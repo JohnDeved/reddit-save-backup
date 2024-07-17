@@ -1,10 +1,5 @@
 {
-  "count": 1,
-  "listing": "https://www.reddit.com/api/info?id=t3_1e5evfo",
-  "posts": [
-    {
-      "err": "ogMeta unexpected status https://v3.redgifs.com/watch/doublesurprisedwoodchuck 451",
-      "id": "t3_1e5evfo"
-    }
-  ]
+  "count": 0,
+  "listing": "https://www.reddit.com/api/info?id=",
+  "posts": []
 }
