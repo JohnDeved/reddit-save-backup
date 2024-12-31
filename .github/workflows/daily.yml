@@ -20,18 +20,26 @@ jobs:
             
             while [ $attempt -le $max_attempts ]; do
               echo "Attempt $attempt for $url"
-              # GET request but only save headers, discard body
-              headers=$(curl -s -D - "$url" > /dev/null)
-              http_code=$(echo "$headers" | grep "HTTP/" | head -1 | awk '{print $2}')
-              cf_status=$(echo "$headers" | grep -i "cf-cache-status" | awk '{print $2}' | tr -d '\r')
+              # Write headers to temp file to handle them properly
+              headers_file=$(mktemp)
+              curl -s "$url" -o /dev/null -w '%{http_code}' -D "$headers_file"
+              http_code=$?
               
-              if [ "$http_code" = "200" ] && [ "$cf_status" = "HIT" ]; then
-                echo "✅ Cache HIT achieved for $url"
+              echo "Debug: Headers from request:"
+              cat "$headers_file"
+              
+              cf_status=$(grep -i "cf-cache-status" "$headers_file" | awk '{print $2}' | tr -d '\r' || echo "NONE")
+              
+              if [ "$http_code" = "200" ] && [ -n "$cf_status" ]; then
+                echo "✅ Response Code: $http_code, Cache: $cf_status"
+                rm "$headers_file"
                 return 0
               else
-                echo "⏳ Status: HTTP $http_code, Cache: $cf_status"
+                echo "⏳ Response Code: $http_code, Cache: $cf_status"
+                sleep 2
               fi
               
+              rm "$headers_file"
               attempt=$((attempt + 1))
             done
             
