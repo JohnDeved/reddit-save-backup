@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Fetch and analyze stored.json
+        env:
+          GH_TOKEN: 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
         run: |
           gh api \
             -H "Accept: application/vnd.github.v3.raw" \
