@@ -13,13 +13,37 @@ jobs:
         env:
           GH_TOKEN: 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
         run: |
+          warm_cache() {
+            local url=$1
+            local max_attempts=5
+            local attempt=1
+            
+            while [ $attempt -le $max_attempts ]; do
+              echo "Attempt $attempt for $url"
+              cf_status=$(curl -sI "$url" | grep -i "cf-cache-status" | awk '{print $2}' | tr -d '\r')
+              
+              if [ "$cf_status" = "HIT" ]; then
+                echo "✅ Cache HIT achieved for $url"
+                return 0
+              else
+                echo "⏳ Cache status: $cf_status..."
+              fi
+              
+              attempt=$((attempt + 1))
+            done
+            
+            echo "❌ Failed to get cache HIT after $max_attempts attempts"
+            return 1
+          }
+
           gh api \
             -H "Accept: application/vnd.github.v3.raw" \
             /repos/JohnDeved/reddit-save-backup/contents/stored.json \
             > stored.json
           echo "Number of entries: $(jq length stored.json)"
-          echo "CDN URLs:"
+          echo "Warming up CDN cache:"
           jq -r '.[] | .cdnUrl | if type == "array" then .[] else . end' stored.json | while read -r url; do
             modified_url=$(echo "$url" | sed -E 's|https?://[^/]+|https://cdn.b-j.dev|')
             echo "- $modified_url"
+            warm_cache "$modified_url"
           done
