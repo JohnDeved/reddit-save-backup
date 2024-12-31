@@ -9,6 +9,9 @@ jobs:
   check-stored-json:
     runs-on: ubuntu-latest
     steps:
+      - name: Install GNU parallel
+        run: sudo apt-get install -y parallel
+
       - name: Fetch and analyze stored.json
         env:
           GH_TOKEN: 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
@@ -45,15 +48,18 @@ jobs:
             echo "❌ Failed to get cache HIT after $max_attempts attempts"
             return 1
           }
+          export -f warm_cache
 
           gh api \
             -H "Accept: application/vnd.github.v3.raw" \
             /repos/JohnDeved/reddit-save-backup/contents/stored.json \
             > stored.json
           echo "Number of entries: $(jq length stored.json)"
-          echo "Warming up CDN cache:"
-          jq -r '.[] | .cdnUrl | if type == "array" then .[] else . end' stored.json | while read -r url; do
-            modified_url=$(echo "$url" | sed -E 's|https?://[^/]+|https://cdn.b-j.dev|')
-            echo "- $modified_url"
-            warm_cache "$modified_url"
-          done
+          echo "Warming up CDN cache (max 5 parallel jobs):"
+          
+          # Create URLs file
+          jq -r '.[] | .cdnUrl | if type == "array" then .[] else . end' stored.json | \
+            sed -E 's|https?://[^/]+|https://cdn.b-j.dev|' > urls.txt
+          
+          # Run warm_cache in parallel
+          parallel --jobs 5 --line-buffer warm_cache :::: urls.txt
