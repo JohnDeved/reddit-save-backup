@@ -20,10 +20,9 @@ jobs:
             
             while [ $attempt -le $max_attempts ]; do
               echo "Attempt $attempt for $url"
-              # Write headers to temp file to handle them properly
               headers_file=$(mktemp)
-              curl -s "$url" -o /dev/null -w '%{http_code}' -D "$headers_file"
-              http_code=$?
+              # Store HTTP code in a variable from curl's output
+              http_code=$(curl -s "$url" -o /dev/null -D "$headers_file" -w '%{http_code}')
               
               echo "Debug: Headers from request:"
               cat "$headers_file"
