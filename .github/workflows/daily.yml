@@ -18,3 +18,8 @@ jobs:
             /repos/JohnDeved/reddit-save-backup/contents/stored.json \
             > stored.json
           echo "Number of entries: $(jq length stored.json)"
+          echo "CDN URLs:"
+          jq -r '.[] | .cdnUrl | if type == "array" then .[] else . end' stored.json | while read -r url; do
+            modified_url=$(echo "$url" | sed -E 's|https?://[^/]+|https://cdn.b-j.dev|')
+            echo "- $modified_url"
+          done
