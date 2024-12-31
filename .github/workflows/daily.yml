@@ -23,8 +23,9 @@ jobs:
               headers_file=$(mktemp)
               http_code=$(curl -s "$url" -o /dev/null -D "$headers_file" -w '%{http_code}')
               
-              echo "Debug: Headers from request:"
+              echo "::group::Response Headers"
               cat "$headers_file"
+              echo "::endgroup::"
               
               cf_status=$(grep -i "cf-cache-status" "$headers_file" | awk '{print $2}' | tr -d '\r' || echo "NONE")
               
