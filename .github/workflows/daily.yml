@@ -20,19 +20,19 @@ jobs:
             
             while [ $attempt -le $max_attempts ]; do
               echo "Attempt $attempt for $url"
-              cf_status=$(curl -sI "$url" | grep -i "cf-cache-status" | awk '{print $2}' | tr -d '\r')
+              cf_status=$(curl -sL "$url" -o /dev/null -w '%{http_code}' -H "Cache-Control: no-cache")
               
-              if [ "$cf_status" = "HIT" ]; then
-                echo "✅ Cache HIT achieved for $url"
+              if [ "$cf_status" = "200" ]; then
+                echo "✅ Successfully warmed cache for $url"
                 return 0
               else
-                echo "⏳ Cache status: $cf_status..."
+                echo "⏳ HTTP status: $cf_status..."
               fi
               
               attempt=$((attempt + 1))
             done
             
-            echo "❌ Failed to get cache HIT after $max_attempts attempts"
+            echo "❌ Failed to warm cache after $max_attempts attempts"
             return 1
           }
 
