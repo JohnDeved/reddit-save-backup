@@ -21,10 +21,13 @@ jobs:
           npm install
           npm start
       - name: Add & Commit
+        id: commit
         uses: EndBug/add-and-commit@v9.1.3
         with:
           message: "Update from GitHub Actions"
+          
       - name: Upload to Gist
+        if: steps.commit.outputs.committed == 'true'
         uses: stellarhub/push-gist-action@v1
         with:
           token: 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
