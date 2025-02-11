@@ -1,6 +1,6 @@
 {
-  "count": 5,
-  "listing": "https://www.reddit.com/api/info?id=t3_1i8mldl,t3_1i5mfc3,t3_1ib7p7v,t3_1ib5x8d,t3_1i7crem",
+  "count": 6,
+  "listing": "https://www.reddit.com/api/info?id=t3_1i8mldl,t3_1i5mfc3,t3_1imnf9x,t3_1ib7p7v,t3_1ib5x8d,t3_1i7crem",
   "posts": [
     {
       "err": "Request entity too large",
@@ -9,6 +9,10 @@
     {
       "err": "Request entity too large",
       "id": "t3_1i5mfc3"
+    },
+    {
+      "err": "Unexpected token '\u0000', \"\u0000\u0000\u0000\u001cftypM4\"... is not valid JSON",
+      "id": "t3_1imnf9x"
     },
     {
       "err": "Unexpected token '\u0000', \"\u0000\u0000\u0000\u001cftypM4\"... is not valid JSON",
