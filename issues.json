@@ -1,7 +1,71 @@
 {
   "count": 19,
-  "listing": "https://www.reddit.com/api/info?id=t3_1j18lnd,t3_1i8mldl,t3_1i5mfc3,t3_1j1itmh,t3_1j087ld,t3_1iymzjo,t3_1iohkxi,t3_1it579t,t3_1is1hbp,t3_1is1wht,t3_1iqs4h1,t3_1inpzik,t3_1inz18i,t3_1inrp6k,t3_1io5oev,t3_1imnf9x,t3_1ib7p7v,t3_1ib5x8d,t3_1i7crem",
+  "listing": "https://www.reddit.com/api/info?id=t3_1j087ld,t3_1inpzik,t3_1imnf9x,t3_1iymzjo,t3_1iohkxi,t3_1ib7p7v,t3_1iqs4h1,t3_1j1itmh,t3_1is1wht,t3_1inrp6k,t3_1inz18i,t3_1io5oev,t3_1i7crem,t3_1is1hbp,t3_1it579t,t3_1ib5x8d,t3_1j18lnd,t3_1i8mldl,t3_1i5mfc3",
   "posts": [
+    {
+      "err": "ogMeta unexpected status https://v3.redgifs.com/watch/683311444836255142 451",
+      "id": "t3_1j087ld"
+    },
+    {
+      "err": "ogMeta unexpected status https://v3.redgifs.com/watch/goldfrequentfirefly 451",
+      "id": "t3_1inpzik"
+    },
+    {
+      "err": "ogMeta unexpected status https://v3.redgifs.com/watch/oliveunpleasantelephantbeetle 451",
+      "id": "t3_1imnf9x"
+    },
+    {
+      "err": "ogMeta unexpected status https://v3.redgifs.com/watch/poshhatefulasianlion 451",
+      "id": "t3_1iymzjo"
+    },
+    {
+      "err": "ogMeta unexpected status https://v3.redgifs.com/watch/stalequizzicalcaiman 451",
+      "id": "t3_1iohkxi"
+    },
+    {
+      "err": "ogMeta unexpected status https://v3.redgifs.com/watch/uselessmeatybream 451",
+      "id": "t3_1ib7p7v"
+    },
+    {
+      "err": "ogMeta unexpected status https://v3.redgifs.com/watch/yellowdesertedafricanhornbill 451",
+      "id": "t3_1iqs4h1"
+    },
+    {
+      "err": "ogMeta unexpected status https://www.redgifs.com/watch/craftymoralgoitered 451",
+      "id": "t3_1j1itmh"
+    },
+    {
+      "err": "ogMeta unexpected status https://www.redgifs.com/watch/frivolousfluidfritillarybutterfly 451",
+      "id": "t3_1is1wht"
+    },
+    {
+      "err": "ogMeta unexpected status https://www.redgifs.com/watch/goldlongaustralianfurseal 451",
+      "id": "t3_1inrp6k"
+    },
+    {
+      "err": "ogMeta unexpected status https://www.redgifs.com/watch/hoarsedearamericanshorthair 451",
+      "id": "t3_1inz18i"
+    },
+    {
+      "err": "ogMeta unexpected status https://www.redgifs.com/watch/impeccabledeliriousworm 451",
+      "id": "t3_1io5oev"
+    },
+    {
+      "err": "ogMeta unexpected status https://www.redgifs.com/watch/lightfarawayanchovy 451",
+      "id": "t3_1i7crem"
+    },
+    {
+      "err": "ogMeta unexpected status https://www.redgifs.com/watch/quaintdescriptivebream 451",
+      "id": "t3_1is1hbp"
+    },
+    {
+      "err": "ogMeta unexpected status https://www.redgifs.com/watch/swiftfragrantscallop 451",
+      "id": "t3_1it579t"
+    },
+    {
+      "err": "ogMeta unexpected status https://www.redgifs.com/watch/tremendousnumbatlanticblackgoby 451",
+      "id": "t3_1ib5x8d"
+    },
     {
       "err": "Request entity too large",
       "id": "t3_1j18lnd"
@@ -13,70 +77,6 @@
     {
       "err": "Request entity too large",
       "id": "t3_1i5mfc3"
-    },
-    {
-      "err": "Unexpected token '\u0000', \"\u0000\u0000\u0000\u001cftypM4\"... is not valid JSON",
-      "id": "t3_1j1itmh"
-    },
-    {
-      "err": "Unexpected token '\u0000', \"\u0000\u0000\u0000\u001cftypM4\"... is not valid JSON",
-      "id": "t3_1j087ld"
-    },
-    {
-      "err": "Unexpected token '\u0000', \"\u0000\u0000\u0000\u001cftypM4\"... is not valid JSON",
-      "id": "t3_1iymzjo"
-    },
-    {
-      "err": "Unexpected token '\u0000', \"\u0000\u0000\u0000\u001cftypM4\"... is not valid JSON",
-      "id": "t3_1iohkxi"
-    },
-    {
-      "err": "Unexpected token '\u0000', \"\u0000\u0000\u0000\u001cftypM4\"... is not valid JSON",
-      "id": "t3_1it579t"
-    },
-    {
-      "err": "Unexpected token '\u0000', \"\u0000\u0000\u0000\u001cftypM4\"... is not valid JSON",
-      "id": "t3_1is1hbp"
-    },
-    {
-      "err": "Unexpected token '\u0000', \"\u0000\u0000\u0000\u001cftypM4\"... is not valid JSON",
-      "id": "t3_1is1wht"
-    },
-    {
-      "err": "Unexpected token '\u0000', \"\u0000\u0000\u0000\u001cftypM4\"... is not valid JSON",
-      "id": "t3_1iqs4h1"
-    },
-    {
-      "err": "Unexpected token '\u0000', \"\u0000\u0000\u0000\u001cftypM4\"... is not valid JSON",
-      "id": "t3_1inpzik"
-    },
-    {
-      "err": "Unexpected token '\u0000', \"\u0000\u0000\u0000\u001cftypM4\"... is not valid JSON",
-      "id": "t3_1inz18i"
-    },
-    {
-      "err": "Unexpected token '\u0000', \"\u0000\u0000\u0000\u001cftypM4\"... is not valid JSON",
-      "id": "t3_1inrp6k"
-    },
-    {
-      "err": "Unexpected token '\u0000', \"\u0000\u0000\u0000\u001cftypM4\"... is not valid JSON",
-      "id": "t3_1io5oev"
-    },
-    {
-      "err": "Unexpected token '\u0000', \"\u0000\u0000\u0000\u001cftypM4\"... is not valid JSON",
-      "id": "t3_1imnf9x"
-    },
-    {
-      "err": "Unexpected token '\u0000', \"\u0000\u0000\u0000\u001cftypM4\"... is not valid JSON",
-      "id": "t3_1ib7p7v"
-    },
-    {
-      "err": "Unexpected token '\u0000', \"\u0000\u0000\u0000\u001cftypM4\"... is not valid JSON",
-      "id": "t3_1ib5x8d"
-    },
-    {
-      "err": "Unexpected token '\u0000', \"\u0000\u0000\u0000\u001cftypM4\"... is not valid JSON",
-      "id": "t3_1i7crem"
     }
   ]
 }
