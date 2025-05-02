@@ -63,6 +63,7 @@ class Downloader {
   ogMeta (url: string) {
     return fetch(url, { headers: { 'user-agent': 'Mozilla/5.0' } })
       .then(response => {
+        console.log('ogMeta', url, response.status)
         if ([404, 410].includes(response.status)) throw new Error(`ogMeta bad status (removed) ${url} ${response.status}`)
         if (!response.ok) throw new Error(`ogMeta unexpected status ${url} ${response.status}`)
         return response.text()
@@ -78,6 +79,7 @@ class Downloader {
         throw new Error(`og:video or og:image not found (removed) ${url}`)
       })
       .then(url => {
+        console.log('ogMeta url', url)
         // strip everything after ?
         const regex = /^(.*?)(\?.*)?$/
         const match = url.match(regex)?.[1]
@@ -85,9 +87,10 @@ class Downloader {
         return match
       })
       .then(url => {
-        if (url.includes('redgifs.com')) {
-          return this.redgifsDirect(url)
-        }
+        // not needed anymore?
+        // if (url.includes('redgifs.com')) {
+        //   return this.redgifsDirect(url)
+        // }
         return this.direct(url)
       })
   }
