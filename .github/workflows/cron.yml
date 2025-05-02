@@ -30,7 +30,7 @@ jobs:
         if: steps.commit.outputs.committed == 'true'
         uses: stellarhub/push-gist-action@v1
         with:
-          token: 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
+          token: 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
           gist_id: 4ccb8e4f68f3b0e3051b844989e29c0a
           file_path: stored.json
 
