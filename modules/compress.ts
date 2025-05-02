@@ -28,12 +28,12 @@ export async function compressMedia (filePath: string) {
     return filePath.replace(/\.mp4/, '_cl.mp4')
   }
 
-  if (filePath.endsWith('_cl.mp4')) {
-    throw new Error('cannot compress already compressed video')
-  }
+  // if (filePath.endsWith('_cl.mp4')) {
+  //   throw new Error('cannot compress already compressed video')
+  // }
 
   if (filePath.endsWith('_c.mp4')) {
-    // adjust bitrate according to video duration to reach 25mb file size. also min scale 720p
+    // adjust bitrate according to video duration to reach 10mb file size. also min scale 720p
     const duration = await new Promise<number | undefined>((resolve, reject) => {
       ffmpeg.input(filePath)
         .ffprobe((err, data) => {
@@ -45,7 +45,8 @@ export async function compressMedia (filePath: string) {
     if (!duration) throw new Error('cannot get video duration')
 
     // bitrate in kb
-    const bitrate = Math.floor(20 * 1024 * 8 / duration)
+    // Target 10MB file size for Discord
+    const bitrate = Math.floor(10 * 1024 * 8 / duration)
     const outPath = filePath.replace(/_c\.mp4/, '_cl.mp4') // cl = compressed lossy
     return new Promise<string>((resolve, reject) => {
       ffmpeg.input(filePath)

@@ -62,9 +62,9 @@ async function uploadFile (name: string, file?: any): Promise<{ filePath: string
   // get file size
   const { size } = await stat(filePath)
 
-  // check if file is bigger than 25mb
-  if (size > 25 * 1024 * 1024) {
-    console.log(`file is bigger than 25mb ${filePath}, trying to compress`)
+  // check if file is bigger than 10mb
+  if (size > 10 * 1024 * 1024) {
+    console.log(`file is bigger than 10mb ${filePath}, trying to compress`)
     const compPath = await compressMedia(filePath)
     const compName = compPath.split('/').pop()
     if (!compName) throw new Error('no compressed name')
