@@ -1,6 +1,7 @@
 import ffmpegPath from 'ffmpeg-static'
 import ffprobe from 'ffprobe-static'
 import Ffmpeg from 'fluent-ffmpeg'
+import { existsSync } from 'fs'
 import { stat } from 'fs/promises'
 
 if (ffmpegPath) Ffmpeg.setFfmpegPath(ffmpegPath)
@@ -20,6 +21,12 @@ export async function compressMedia (filePath: string) {
   const ffmpeg = Ffmpeg()
     .on('stdout', console.log)
     .on('stderr', console.log)
+
+  // check if file already exists in compressed format
+  if (filePath.endsWith('.mp4') && existsSync(filePath.replace(/\.mp4/, '_cl.mp4'))) {
+    console.log('compressed file already exists')
+    return filePath.replace(/\.mp4/, '_cl.mp4')
+  }
 
   if (filePath.endsWith('_cl.mp4')) {
     throw new Error('cannot compress already compressed video')

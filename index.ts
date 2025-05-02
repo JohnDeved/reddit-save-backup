@@ -84,6 +84,8 @@ async function uploadFile (name: string, file?: any): Promise<{ filePath: string
   //   }
   // }
 
+  console.log(`uploading file ${filePath}, size: ${size}`)
+
   const channel = await getChannel()
   const readStream = createReadStream(filePath)
   const message = await channel.send({ files: [new Discord.AttachmentBuilder(readStream, { name })] })
