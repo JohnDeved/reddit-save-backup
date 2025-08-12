@@ -1,6 +1,6 @@
 {
-  "count": 78,
-  "listing": "https://www.reddit.com/api/info?id=t3_dj481c,t3_eag8vv,t3_e8zr1s,t3_e7n8ge,t3_e7ill8,t3_e7f6fv,t3_e7ew81,t3_e7ecfu,t3_e7g3up,t3_e7emki,t3_e5k50q,t3_e47u51,t3_e468xi,t3_e3wl5n,t3_e3zfe6,t3_e44wot,t3_e1bzkc,t3_e1ev9r,t3_e0ec2m,t3_e0545d,t3_dzm3nc,t3_dyuwvz,t3_dx2gdx,t3_dxq5db,t3_dtpabd,t3_dt9l33,t3_dt67ac,t3_dspdhy,t3_drowls,t3_dqh7tz,t3_dq7e90,t3_dpyk9f,t3_dphlub,t3_dp1qaw,t3_dodnv7,t3_dnn2y8,t3_dnbf95,t3_dnaq8x,t3_dm1z8z,t3_dkj78b,t3_bn1pbi,t3_4h5gs9,t3_aqex7o,t3_diusc8,t3_dj444q,t3_diimd9,t3_diisqw,t3_di76xn,t3_dhpf92,t3_dhpnpb,t3_dhah40,t3_dgtgko,t3_b2bhos,t3_a6qxl1,t3_baybco,t3_dfd7bp,t3_dfkrad,t3_ddki6h,t3_dd0cvp,t3_dc2zvh,t3_dcoyfh,t3_dbuv9j,t3_dbrvs5,t3_dbfv7l,t3_dbb3ez,t3_d9tbo4,t3_d84gud,t3_d6suv5,t3_d6f890,t3_d5kfow,t3_d5mkkb,t3_d5rk6y,t3_botcg1,t3_d17zvo,t3_d0o7l9,t3_3ltlas,t3_7vwhsu,t3_e3xqj9",
+  "count": 86,
+  "listing": "https://www.reddit.com/api/info?id=t3_dj481c,t3_eag8vv,t3_e8zr1s,t3_e7n8ge,t3_e7ill8,t3_e7f6fv,t3_e7ew81,t3_e7ecfu,t3_e7g3up,t3_e7emki,t3_e5k50q,t3_e47u51,t3_e468xi,t3_e3wl5n,t3_e3zfe6,t3_e44wot,t3_e1bzkc,t3_e1ev9r,t3_e0ec2m,t3_e0545d,t3_dzm3nc,t3_dyuwvz,t3_dx2gdx,t3_dxq5db,t3_dtpabd,t3_dt9l33,t3_dt67ac,t3_dspdhy,t3_drowls,t3_dqh7tz,t3_dq7e90,t3_dpyk9f,t3_dphlub,t3_dp1qaw,t3_dodnv7,t3_dnn2y8,t3_dnbf95,t3_dnaq8x,t3_dm1z8z,t3_dkj78b,t3_bn1pbi,t3_4h5gs9,t3_aqex7o,t3_diusc8,t3_dj444q,t3_diimd9,t3_diisqw,t3_di76xn,t3_dhpf92,t3_dhpnpb,t3_dhah40,t3_dgtgko,t3_b2bhos,t3_a6qxl1,t3_baybco,t3_dfd7bp,t3_dfkrad,t3_ddki6h,t3_dd0cvp,t3_dc2zvh,t3_dcoyfh,t3_dbuv9j,t3_dbrvs5,t3_dbfv7l,t3_dbb3ez,t3_d9tbo4,t3_d84gud,t3_d6suv5,t3_d6f890,t3_d5kfow,t3_d5mkkb,t3_d5rk6y,t3_botcg1,t3_d17zvo,t3_d0o7l9,t3_czl13e,t3_cyi7ax,t3_cym411,t3_cyddgc,t3_cyautd,t3_cyedae,t3_d0k6op,t3_3ltlas,t3_7vwhsu,t3_e3xqj9,t3_cur99g",
   "posts": [
     {
       "err": "direct unexpected URL https://www.pornhub.com/embed/ph5d930dabe980d",
@@ -303,6 +303,34 @@
       "id": "t3_d0o7l9"
     },
     {
+      "err": "fetch failed",
+      "id": "t3_czl13e"
+    },
+    {
+      "err": "fetch failed",
+      "id": "t3_cyi7ax"
+    },
+    {
+      "err": "fetch failed",
+      "id": "t3_cym411"
+    },
+    {
+      "err": "fetch failed",
+      "id": "t3_cyddgc"
+    },
+    {
+      "err": "fetch failed",
+      "id": "t3_cyautd"
+    },
+    {
+      "err": "ffmpeg exited with code 1: ./media/t3_cyedae_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl_cl.mp4: File name too long\n",
+      "id": "t3_cyedae"
+    },
+    {
+      "err": "ogMeta unexpected status https://www.reddit.com/r/bodyperfection/comments/d0k6op/colleen_cole/ 403",
+      "id": "t3_d0k6op"
+    },
+    {
       "err": "ogMeta unexpected status https://www.reddit.com/r/orgasmcontrol/comments/3ltlas/difficult_orgasm_control_video_challenges/ 403",
       "id": "t3_3ltlas"
     },
@@ -313,6 +341,10 @@
     {
       "err": "ogMeta unexpected status https://www.reddit.com/r/Sydneycolexxx/comments/e3xqj9/brazzers_sydney_cole_sexflix_n_chill_keiran_lee/ 403",
       "id": "t3_e3xqj9"
+    },
+    {
+      "err": "terminated",
+      "id": "t3_cur99g"
     }
   ]
 }
