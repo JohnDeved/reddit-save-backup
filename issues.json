@@ -1,50 +1,10 @@
 {
-  "count": 21,
-  "listing": "https://www.reddit.com/api/info?id=t3_cfkkcg,t3_cnzft6,t3_co3qsh,t3_cn5b86,t3_cgf3ew,t3_cfcyrm,t3_cdyi11,t3_cclbgs,t3_aypl8w,t3_bz0dpp,t3_c9fxcr,t3_c7yke1,t3_c5mimc,t3_c2swcg,t3_bytuvs,t3_bcrm0f,t3_bc152z,t3_b9sczs,t3_b6hcm9,t3_b4rtol,t3_b447wk",
+  "count": 6,
+  "listing": "https://www.reddit.com/api/info?id=t3_awzwod,t3_c7yke1,t3_c5mimc,t3_bc152z,t3_b9sczs,t3_b6hcm9",
   "posts": [
     {
-      "err": "terminated",
-      "id": "t3_cfkkcg"
-    },
-    {
-      "err": "terminated",
-      "id": "t3_cnzft6"
-    },
-    {
-      "err": "terminated",
-      "id": "t3_co3qsh"
-    },
-    {
-      "err": "terminated",
-      "id": "t3_cn5b86"
-    },
-    {
-      "err": "terminated",
-      "id": "t3_cgf3ew"
-    },
-    {
-      "err": "terminated",
-      "id": "t3_cfcyrm"
-    },
-    {
-      "err": "terminated",
-      "id": "t3_cdyi11"
-    },
-    {
-      "err": "terminated",
-      "id": "t3_cclbgs"
-    },
-    {
-      "err": "terminated",
-      "id": "t3_aypl8w"
-    },
-    {
-      "err": "terminated",
-      "id": "t3_bz0dpp"
-    },
-    {
-      "err": "terminated",
-      "id": "t3_c9fxcr"
+      "err": "direct unexpected URL https://i.vimeocdn.com/video/763732296-0cc90559c7504b7f9dcbe412cdbc4d881d4904b8163e05a6179651cf98020110-d",
+      "id": "t3_awzwod"
     },
     {
       "err": "terminated",
@@ -53,18 +13,6 @@
     {
       "err": "terminated",
       "id": "t3_c5mimc"
-    },
-    {
-      "err": "terminated",
-      "id": "t3_c2swcg"
-    },
-    {
-      "err": "terminated",
-      "id": "t3_bytuvs"
-    },
-    {
-      "err": "terminated",
-      "id": "t3_bcrm0f"
     },
     {
       "err": "terminated",
@@ -77,14 +25,6 @@
     {
       "err": "terminated",
       "id": "t3_b6hcm9"
-    },
-    {
-      "err": "terminated",
-      "id": "t3_b4rtol"
-    },
-    {
-      "err": "terminated",
-      "id": "t3_b447wk"
     }
   ]
 }
