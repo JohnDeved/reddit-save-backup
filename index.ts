@@ -21,11 +21,17 @@ let consecutiveFailures = 0
 let processedCount = 0
 
 function sanitizeFileName (name: string): string {
-  // Remove or replace problematic characters and limit length
-  return name
+  // Remove or replace problematic characters and limit length while preserving extension
+  const lastDotIndex = name.lastIndexOf('.')
+  const baseName = lastDotIndex > 0 ? name.substring(0, lastDotIndex) : name
+  const extension = lastDotIndex > 0 ? name.substring(lastDotIndex) : ''
+  
+  const sanitizedBase = baseName
     .replace(/[<>:"/\\|?*]/g, '_')
     .replace(/\s+/g, '_')
-    .substring(0, 100) // Limit length to prevent "File name too long" errors
+    .substring(0, 100 - extension.length) // Reserve space for extension
+  
+  return sanitizedBase + extension
 }
 
 async function sleep (ms: number): Promise<void> {
@@ -133,10 +139,14 @@ async function handleDownloadError (saved: { name: string, [key: string]: any },
 
   if (error instanceof Error) {
     console.error(`Error processing ${saved.name}:`, error.message)
-    if (error.message.includes('removed')) {
-      console.log('seems to be removed', saved)
+    
+    // Handle specific error types that should reset failure counter
+    if (error.message.includes('removed') || 
+        error.message.includes('blocked domain') ||
+        error.message.includes('access forbidden')) {
+      console.log('Post removed, blocked, or forbidden - not counting as consecutive failure:', saved)
       oldSaved = oldSaved.filter(id => id !== saved.name)
-      consecutiveFailures = 0 // Reset on successful removal detection
+      consecutiveFailures = 0 // Reset on known non-network issues
       return reddit.setUserUnsaved(saved.name)
     }
   }
@@ -312,4 +322,36 @@ discord.login(config.DISCORD_TOKEN)
       listing,
       posts: issuePosts,
     }, null, 2))
+    
+    console.log('\n✅ Reddit backup completed successfully!')
+    console.log(`📊 Summary: ${stored.length} posts saved, ${issuePosts.length} issues`)
+  })
+  .catch(async (error) => {
+    console.error('💥 Fatal error during backup:', error)
+    
+    // Save current progress even on error
+    try {
+      oldSaved = oldSaved.filter(id => !stored.find(item => item.name === id))
+      await writeFile('./old.saved.json', JSON.stringify(oldSaved, null, 2))
+      await writeFile('./stored.json', JSON.stringify(stored, null, 2))
+      
+      // Add the termination error to issues
+      issuePosts.push({
+        err: error instanceof Error ? error.message : 'unknown error',
+        id: 'TERMINATED'
+      })
+      
+      await writeFile('./issues.json', JSON.stringify({
+        count: issuePosts.length,
+        listing: '',
+        posts: issuePosts,
+      }, null, 2))
+      
+      console.log(`💾 Progress saved: ${stored.length} posts, ${issuePosts.length} issues`)
+    } catch (saveError) {
+      console.error('❌ Failed to save progress:', saveError)
+    }
+    
+    discord.destroy()
+    process.exit(1)
   })

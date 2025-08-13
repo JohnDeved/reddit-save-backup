@@ -2,6 +2,45 @@ import { Headers, FormData, fetch } from 'undici'
 import z from 'zod'
 import { inspect } from 'util'
 
+// Add timeout and retry configuration for Reddit API
+const FETCH_TIMEOUT = 30000 // 30 seconds
+const MAX_RETRIES = 3
+const RETRY_DELAY = 2000 // 2 seconds
+
+async function fetchWithTimeout (url: string, options: Record<string, any> = {}) {
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => { controller.abort() }, FETCH_TIMEOUT)
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    })
+    return response
+  } finally {
+    clearTimeout(timeoutId)
+  }
+}
+
+async function fetchWithRetry (url: string, options: Record<string, any> = {}) {
+  let lastError: Error | null = null
+
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      return await fetchWithTimeout(url, options)
+    } catch (error) {
+      lastError = error as Error
+      console.warn(`Reddit API attempt ${attempt}/${MAX_RETRIES} failed for ${url}:`, error)
+
+      if (attempt < MAX_RETRIES) {
+        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * attempt))
+      }
+    }
+  }
+
+  throw lastError ?? new Error(`Failed to fetch ${url} after ${MAX_RETRIES} attempts`)
+}
+
 export class Reddit {
   constructor (
     private readonly clientId: string,
@@ -35,7 +74,7 @@ export class Reddit {
     formdata.append('username', this.username)
     formdata.append('password', this.password)
 
-    const token = await fetch('https://www.reddit.com/api/v1/access_token', {
+    const token = await fetchWithRetry('https://www.reddit.com/api/v1/access_token', {
       method: 'POST',
       headers: myHeaders,
       body: formdata,
@@ -60,7 +99,7 @@ export class Reddit {
     const headers = await this.getAuthHeader()
 
     console.log(method, path)
-    const data = await fetch(`https://oauth.reddit.com${path}`, { method, headers, body })
+    const data = await fetchWithRetry(`https://oauth.reddit.com${path}`, { method, headers, body })
       .then(response => response.json())
 
     console.log(method, path, 'response', inspect(data, { colors: true, depth: null }))

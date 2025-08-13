@@ -104,6 +104,7 @@ class Downloader {
       .then(response => {
         console.log('ogMeta', url, response.status)
         if ([404, 410].includes(response.status)) throw new Error(`ogMeta bad status (removed) ${url} ${response.status}`)
+        if ([403, 429].includes(response.status)) throw new Error(`ogMeta access forbidden ${url} ${response.status}`)
         if (!response.ok) throw new Error(`ogMeta unexpected status ${url} ${response.status}`)
         return response.text()
       })
@@ -136,6 +137,15 @@ class Downloader {
 
   async download (url: string) {
     if (!url.startsWith('http')) throw new Error(`download unexpected URL (removed) ${url}`)
+    
+    // Block unsupported domains that are known to cause issues
+    const blockedDomains = ['pornhub.com', 'xvideos.com', 'xnxx.com']
+    const { hostname } = new URL(url)
+    
+    if (blockedDomains.some(domain => hostname.includes(domain))) {
+      throw new Error(`download blocked domain ${hostname} - unsupported site`)
+    }
+    
     const { pathname } = new URL(url)
 
     if (directExt.some(ext => pathname.endsWith(`.${ext}`))) {
