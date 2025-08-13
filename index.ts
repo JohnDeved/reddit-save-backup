@@ -19,18 +19,30 @@ const BATCH_SIZE = 20 // Process posts in batches
 // Track consecutive failures for early termination
 let consecutiveFailures = 0
 let processedCount = 0
+let isGracefullyShuttingDown = false
+
+// Handle process termination signals gracefully
+process.on('SIGTERM', () => {
+  console.log('📨 Received SIGTERM, initiating graceful shutdown...')
+  isGracefullyShuttingDown = true
+})
+
+process.on('SIGINT', () => {
+  console.log('📨 Received SIGINT, initiating graceful shutdown...')
+  isGracefullyShuttingDown = true
+})
 
 function sanitizeFileName (name: string): string {
   // Remove or replace problematic characters and limit length while preserving extension
   const lastDotIndex = name.lastIndexOf('.')
   const baseName = lastDotIndex > 0 ? name.substring(0, lastDotIndex) : name
   const extension = lastDotIndex > 0 ? name.substring(lastDotIndex) : ''
-  
+
   const sanitizedBase = baseName
     .replace(/[<>:"/\\|?*]/g, '_')
     .replace(/\s+/g, '_')
     .substring(0, 100 - extension.length) // Reserve space for extension
-  
+
   return sanitizedBase + extension
 }
 
@@ -106,7 +118,7 @@ async function uploadFile (name: string, file?: any): Promise<{ filePath: string
       // If compression fails due to corrupted intermediate files, clean them up
       const compCPath = filePath.replace(/\.mp4$/, '_c.mp4')
       const compClPath = filePath.replace(/\.mp4$/, '_cl.mp4')
-      
+
       if (existsSync(compCPath)) {
         console.warn(`Removing potentially corrupted file: ${compCPath}`)
         await unlink(compCPath)
@@ -115,7 +127,7 @@ async function uploadFile (name: string, file?: any): Promise<{ filePath: string
         console.warn(`Removing potentially corrupted file: ${compClPath}`)
         await unlink(compClPath)
       }
-      
+
       throw error
     }
   }
@@ -154,13 +166,13 @@ async function getRedditPosts () {
 }
 
 async function handleDownloadError (saved: { name: string, [key: string]: any }, error: unknown) {
-  consecutiveFailures++
+  let shouldCountAsFailure = true
 
   if (error instanceof Error) {
     console.error(`Error processing ${saved.name}:`, error.message)
-    
+
     // Handle specific error types that should reset failure counter
-    if (error.message.includes('removed') || 
+    if (error.message.includes('removed') ||
         error.message.includes('blocked domain') ||
         error.message.includes('access forbidden')) {
       console.log('Post removed, blocked, or forbidden - not counting as consecutive failure:', saved)
@@ -168,6 +180,23 @@ async function handleDownloadError (saved: { name: string, [key: string]: any },
       consecutiveFailures = 0 // Reset on known non-network issues
       return reddit.setUserUnsaved(saved.name)
     }
+
+    // Handle timeout, abort, and termination errors - these shouldn't count as consecutive failures
+    if (error.message.includes('aborted') ||
+        error.message.includes('timeout') ||
+        error.message.includes('terminated') ||
+        error.message.includes('ETIMEDOUT') ||
+        error.message.includes('ECONNRESET') ||
+        error.name === 'AbortError' ||
+        error.name === 'TimeoutError') {
+      console.log('Network/timeout error - not counting as consecutive failure:', saved.name, error.message)
+      shouldCountAsFailure = false
+    }
+  }
+
+  // Only increment consecutive failures for actual processing errors, not network issues
+  if (shouldCountAsFailure) {
+    consecutiveFailures++
   }
 
   issuePosts.push({
@@ -175,13 +204,13 @@ async function handleDownloadError (saved: { name: string, [key: string]: any },
     id: saved.name,
   })
 
-  // Early termination check
-  if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
+  // Early termination check only for non-network errors
+  if (shouldCountAsFailure && consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
     console.warn(`⚠️ ${MAX_CONSECUTIVE_FAILURES} consecutive failures reached. Terminating early to prevent infinite loop.`)
     throw new Error(`Too many consecutive failures (${MAX_CONSECUTIVE_FAILURES}). Terminating.`)
   }
 
-  console.error(`Failure ${consecutiveFailures}/${MAX_CONSECUTIVE_FAILURES}:`, error, saved)
+  console.error(`Failure ${consecutiveFailures}/${MAX_CONSECUTIVE_FAILURES} (network errors not counted):`, error, saved)
 }
 
 async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>) {
@@ -193,6 +222,12 @@ async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>)
     console.log(`\n🔄 Processing batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(posts.length / BATCH_SIZE)} (posts ${i + 1}-${Math.min(i + BATCH_SIZE, posts.length)})`)
 
     for (const { data: saved } of batch) {
+      // Check for graceful shutdown signal
+      if (isGracefullyShuttingDown) {
+        console.log('🛑 Graceful shutdown requested, stopping post processing')
+        break
+      }
+
       processedCount++
       console.log(`\n📋 Processing post ${processedCount}/${posts.length}: ${saved.name}`)
 
@@ -230,6 +265,12 @@ async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>)
 
       // Rate limiting
       await sleep(RATE_LIMIT_DELAY)
+    }
+
+    // Check for graceful shutdown before next batch
+    if (isGracefullyShuttingDown) {
+      console.log('🛑 Graceful shutdown requested, stopping batch processing')
+      break
     }
 
     // Longer delay between batches
@@ -341,36 +382,36 @@ discord.login(config.DISCORD_TOKEN)
       listing,
       posts: issuePosts,
     }, null, 2))
-    
+
     console.log('\n✅ Reddit backup completed successfully!')
     console.log(`📊 Summary: ${stored.length} posts saved, ${issuePosts.length} issues`)
   })
   .catch(async (error) => {
     console.error('💥 Fatal error during backup:', error)
-    
+
     // Save current progress even on error
     try {
       oldSaved = oldSaved.filter(id => !stored.find(item => item.name === id))
       await writeFile('./old.saved.json', JSON.stringify(oldSaved, null, 2))
       await writeFile('./stored.json', JSON.stringify(stored, null, 2))
-      
+
       // Add the termination error to issues
       issuePosts.push({
         err: error instanceof Error ? error.message : 'unknown error',
-        id: 'TERMINATED'
+        id: 'TERMINATED',
       })
-      
+
       await writeFile('./issues.json', JSON.stringify({
         count: issuePosts.length,
         listing: '',
         posts: issuePosts,
       }, null, 2))
-      
+
       console.log(`💾 Progress saved: ${stored.length} posts, ${issuePosts.length} issues`)
     } catch (saveError) {
       console.error('❌ Failed to save progress:', saveError)
     }
-    
+
     discord.destroy()
     process.exit(1)
   })

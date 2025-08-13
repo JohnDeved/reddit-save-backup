@@ -4,7 +4,7 @@ import { fetch } from 'undici'
 const directExt = ['jpg', 'jpeg', 'png', 'gif', 'mp4']
 
 // Add timeout and retry configuration
-const FETCH_TIMEOUT = 30000 // 30 seconds
+const FETCH_TIMEOUT = 60000 // 60 seconds (increased from 30)
 const MAX_RETRIES = 3
 const RETRY_DELAY = 2000 // 2 seconds
 
@@ -34,7 +34,10 @@ async function fetchWithRetry (url: string, options: Record<string, any> = {}) {
       console.warn(`Fetch attempt ${attempt}/${MAX_RETRIES} failed for ${url}:`, error)
 
       if (attempt < MAX_RETRIES) {
-        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * attempt))
+        // Exponential backoff: 2s, 4s, 6s
+        const delay = RETRY_DELAY * attempt
+        console.log(`⏳ Retrying in ${delay}ms...`)
+        await new Promise(resolve => setTimeout(resolve, delay))
       }
     }
   }
@@ -137,15 +140,15 @@ class Downloader {
 
   async download (url: string) {
     if (!url.startsWith('http')) throw new Error(`download unexpected URL (removed) ${url}`)
-    
+
     // Block unsupported domains that are known to cause issues - check this FIRST before any network calls
     const blockedDomains = ['pornhub.com', 'xvideos.com', 'xnxx.com', 'gfycat.com', 'cdninstagram.com']
     const { hostname } = new URL(url)
-    
+
     if (blockedDomains.some(domain => hostname.includes(domain))) {
       throw new Error(`download blocked domain ${hostname} - expired or inaccessible URL`)
     }
-    
+
     const { pathname } = new URL(url)
 
     if (directExt.some(ext => pathname.endsWith(`.${ext}`))) {
