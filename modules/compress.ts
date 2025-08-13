@@ -27,8 +27,8 @@ export async function compressMedia (filePath: string) {
     throw new Error(`File already compressed to lossy format: ${filePath}`)
   }
 
-  // check if file already exists in compressed format
-  if (filePath.endsWith('.mp4') && existsSync(filePath.replace(/\.mp4/, '_cl.mp4'))) {
+  // check if file already exists in compressed format (only for original files, not _c files)
+  if (filePath.endsWith('.mp4') && !filePath.includes('_c.mp4') && existsSync(filePath.replace(/\.mp4/, '_cl.mp4'))) {
     console.log('compressed file already exists')
     return filePath.replace(/\.mp4/, '_cl.mp4')
   }
