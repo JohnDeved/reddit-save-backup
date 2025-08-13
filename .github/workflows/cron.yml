@@ -25,12 +25,5 @@ jobs:
         uses: EndBug/add-and-commit@v9.1.3
         with:
           message: "Update from GitHub Actions"
-          
-      - name: Upload to Gist
-        if: steps.commit.outputs.committed == 'true'
-        uses: stellarhub/push-gist-action@v1
-        with:
-          token: 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
-          gist_id: 4ccb8e4f68f3b0e3051b844989e29c0a
-          file_path: stored.json
+        
 
