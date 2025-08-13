@@ -3,3 +3,6 @@ node_modules
 media/*
 !media/.gitkeep
 .DS_Store
+
+# Compiled JavaScript files (use TypeScript source)
+modules/*.js

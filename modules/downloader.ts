@@ -138,7 +138,7 @@ class Downloader {
   async download (url: string) {
     if (!url.startsWith('http')) throw new Error(`download unexpected URL (removed) ${url}`)
     
-    // Block unsupported domains that are known to cause issues
+    // Block unsupported domains that are known to cause issues - check this FIRST before any network calls
     const blockedDomains = ['pornhub.com', 'xvideos.com', 'xnxx.com', 'gfycat.com']
     const { hostname } = new URL(url)
     
