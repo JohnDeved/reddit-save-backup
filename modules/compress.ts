@@ -22,9 +22,10 @@ export async function compressMedia (filePath: string) {
     .on('stdout', console.log)
     .on('stderr', console.log)
 
-  // Prevent infinite compression cycles
+  // If file is already compressed to lossy format, return as-is for upload
   if (filePath.includes('_cl.mp4')) {
-    throw new Error(`File already compressed to lossy format: ${filePath}`)
+    console.log(`File already compressed to lossy format, returning for upload: ${filePath}`)
+    return filePath
   }
 
   // check if file already exists in compressed format (only for original files, not _c files)
