@@ -2,6 +2,7 @@ import * as Discord from 'discord.js'
 import { createReadStream, createWriteStream, existsSync, readFileSync } from 'fs'
 import { stat, writeFile, unlink } from 'fs/promises'
 import { pipeline } from 'stream/promises'
+import { Readable } from 'stream'
 import z from 'zod'
 import { config } from './modules/config'
 import { downloader } from './modules/downloader'
@@ -9,8 +10,33 @@ import { Reddit } from './modules/reddit'
 import { compressMedia } from './modules/compress'
 import { getMediaResolution } from './modules/mediaResolution'
 import { getPinnedClips } from './modules/clips'
-// import Ffmpeg from 'fluent-ffmpeg'
-// const ffmpeg = Ffmpeg()
+
+// Performance and reliability improvements
+const MAX_CONSECUTIVE_FAILURES = 10
+const RATE_LIMIT_DELAY = 1000 // 1 second between requests
+const BATCH_SIZE = 20 // Process posts in batches
+
+// Track consecutive failures for early termination
+let consecutiveFailures = 0
+let processedCount = 0
+
+function sanitizeFileName (name: string): string {
+  // Remove or replace problematic characters and limit length while preserving extension
+  const lastDotIndex = name.lastIndexOf('.')
+  const baseName = lastDotIndex > 0 ? name.substring(0, lastDotIndex) : name
+  const extension = lastDotIndex > 0 ? name.substring(lastDotIndex) : ''
+  
+  const sanitizedBase = baseName
+    .replace(/[<>:"/\\|?*]/g, '_')
+    .replace(/\s+/g, '_')
+    .substring(0, 100 - extension.length) // Reserve space for extension
+  
+  return sanitizedBase + extension
+}
+
+async function sleep (ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
 
 // ffmpeg.input()
 const reddit = new Reddit(config.CLIENT_ID, config.CLIENT_SECRET, config.REDDIT_USERNAME, config.REDDIT_PASSWORD)
@@ -46,12 +72,16 @@ async function getChannel () {
 }
 
 async function uploadFile (name: string, file?: any): Promise<{ filePath: string, path: string, id: string, url: string }> {
-  const filePath = `./media/${name}`
+  const sanitizedName = sanitizeFileName(name)
+  const filePath = `./media/${sanitizedName}`
   // check if file exists
   let cached = false
   if (!existsSync(filePath)) {
+    if (!file) throw new Error('File stream is required for new downloads')
     const writeStream = createWriteStream(filePath)
-    await pipeline(file, writeStream)
+    // Convert web ReadableStream to Node.js readable stream if needed
+    const nodeStream = file.pipe ? file : Readable.fromWeb(file)
+    await pipeline(nodeStream, writeStream)
     console.log(`downloaded file ${filePath}`)
   } else {
     // kill stream
@@ -65,10 +95,29 @@ async function uploadFile (name: string, file?: any): Promise<{ filePath: string
   // check if file is bigger than 10mb
   if (size > 10 * 1024 * 1024) {
     console.log(`file is bigger than 10mb ${filePath}, trying to compress`)
-    const compPath = await compressMedia(filePath)
-    const compName = compPath.split('/').pop()
-    if (!compName) throw new Error('no compressed name')
-    return uploadFile(compName)
+    try {
+      const compPath = await compressMedia(filePath)
+      // Extract just the filename from the compressed path for recursive call
+      const compName = compPath.split('/').pop()
+      if (!compName) throw new Error('no compressed name')
+      // The compressed file already exists, so call uploadFile without file stream
+      return uploadFile(compName)
+    } catch (error) {
+      // If compression fails due to corrupted intermediate files, clean them up
+      const compCPath = filePath.replace(/\.mp4$/, '_c.mp4')
+      const compClPath = filePath.replace(/\.mp4$/, '_cl.mp4')
+      
+      if (existsSync(compCPath)) {
+        console.warn(`Removing potentially corrupted file: ${compCPath}`)
+        await unlink(compCPath)
+      }
+      if (existsSync(compClPath)) {
+        console.warn(`Removing potentially corrupted file: ${compClPath}`)
+        await unlink(compClPath)
+      }
+      
+      throw error
+    }
   }
 
   // check if file is smaller than 8kb
@@ -76,19 +125,11 @@ async function uploadFile (name: string, file?: any): Promise<{ filePath: string
     throw new Error(`file is smaller than 8kb ${filePath}, there must be something wrong`)
   }
 
-  // if (cached) {
-  //   // bypass compressed files for now
-  //   if (!filePath.endsWith('_c.mp4') && !filePath.endsWith('_cl.mp4')) {
-  //     // throw error until wierd upload bug is fixed
-  //     throw new Error(`file upload aborted ${filePath}`)
-  //   }
-  // }
-
   console.log(`uploading file ${filePath}, size: ${size}`)
 
   const channel = await getChannel()
   const readStream = createReadStream(filePath)
-  const message = await channel.send({ files: [new Discord.AttachmentBuilder(readStream, { name })] })
+  const message = await channel.send({ files: [new Discord.AttachmentBuilder(readStream, { name: sanitizedName })] })
   const path = message.attachments.first()?.url
   if (!path) throw new Error('attachment not found')
 
@@ -112,12 +153,19 @@ async function getRedditPosts () {
   return posts
 }
 
-async function handleDownloadError (saved: any, error: unknown) {
+async function handleDownloadError (saved: { name: string, [key: string]: any }, error: unknown) {
+  consecutiveFailures++
+
   if (error instanceof Error) {
-    console.error(error.message)
-    if (error.message.includes('removed')) {
-      console.log('seems to be removed', saved)
+    console.error(`Error processing ${saved.name}:`, error.message)
+    
+    // Handle specific error types that should reset failure counter
+    if (error.message.includes('removed') || 
+        error.message.includes('blocked domain') ||
+        error.message.includes('access forbidden')) {
+      console.log('Post removed, blocked, or forbidden - not counting as consecutive failure:', saved)
       oldSaved = oldSaved.filter(id => id !== saved.name)
+      consecutiveFailures = 0 // Reset on known non-network issues
       return reddit.setUserUnsaved(saved.name)
     }
   }
@@ -126,94 +174,141 @@ async function handleDownloadError (saved: any, error: unknown) {
     err: error instanceof Error ? error.message : JSON.stringify(error),
     id: saved.name,
   })
-  console.error(error, saved)
+
+  // Early termination check
+  if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
+    console.warn(`⚠️ ${MAX_CONSECUTIVE_FAILURES} consecutive failures reached. Terminating early to prevent infinite loop.`)
+    throw new Error(`Too many consecutive failures (${MAX_CONSECUTIVE_FAILURES}). Terminating.`)
+  }
+
+  console.error(`Failure ${consecutiveFailures}/${MAX_CONSECUTIVE_FAILURES}:`, error, saved)
 }
 
 async function downloadPosts (posts: Awaited<ReturnType<typeof getRedditPosts>>) {
-  for (const { data: saved } of posts) {
-    if (stored.find(item => item.id === saved.id)) {
-      console.log('already saved', saved.name)
-      await reddit.setUserUnsaved(saved.name)
-      continue
-    }
-    if (saved.url.includes('www.reddit.com/gallery/')) {
-      const galleryId = saved.url.split('/').pop()
-      if (galleryId) {
-        const response = await reddit.getPostInfos([`t3_${galleryId}`])
-        if (response.children.length !== 0) {
-          const galleryPost = response.children[0].data
-          saved.gallery_data = galleryPost.gallery_data
-          saved.media_metadata = galleryPost.media_metadata
-        }
+  console.log(`📥 Starting to process ${posts.length} posts in batches of ${BATCH_SIZE}`)
+
+  // Process posts in batches to avoid overwhelming APIs
+  for (let i = 0; i < posts.length; i += BATCH_SIZE) {
+    const batch = posts.slice(i, i + BATCH_SIZE)
+    console.log(`\n🔄 Processing batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(posts.length / BATCH_SIZE)} (posts ${i + 1}-${Math.min(i + BATCH_SIZE, posts.length)})`)
+
+    for (const { data: saved } of batch) {
+      processedCount++
+      console.log(`\n📋 Processing post ${processedCount}/${posts.length}: ${saved.name}`)
+
+      if (stored.find(item => item.id === saved.id)) {
+        console.log('✅ already saved', saved.name)
+        await reddit.setUserUnsaved(saved.name)
+        consecutiveFailures = 0 // Reset on success
+        continue
       }
-    }
-    if (saved.gallery_data && saved.media_metadata) {
-      const orgUrls: string[] = []
-      const cdnUrls: string[] = []
-      const msgIds: string[] = []
-      const msgUrls: string[] = []
-      let height = 0
-      let width = 0
-      for (const { media_id } of saved.gallery_data.items) {
-        const index = saved.gallery_data.items.findIndex(item => item.media_id === media_id)
-        const media = saved.media_metadata[media_id]
-        const ext = media.m.split('/').pop()
-        if (!ext) continue
-        try {
-          const url = `https://i.redd.it/${media_id}.${ext}`
-          console.log('downloading', media_id, url)
-          const file = await downloader.download(url)
-          const upload = await uploadFile(`${saved.name}.${index}.${file.ext}`, file.stream)
-          if (index === 0) {
-            const res = await getMediaResolution(upload.filePath)
-            height = res.height
-            width = res.width
-          }
-          orgUrls.push(url)
-          cdnUrls.push(upload.path)
-          msgIds.push(upload.id)
-          msgUrls.push(upload.url)
-        } catch (error) {
-          await handleDownloadError(saved, error)
-        }
-      }
-      stored.push({
-        id: saved.id,
-        title: saved.title,
-        name: saved.name,
-        orgUrl: orgUrls,
-        cdnUrl: cdnUrls,
-        msgId: msgIds,
-        msgUrl: msgUrls,
-        created: saved.created,
-        height,
-        width,
-      })
-      await writeFile('./stored.json', JSON.stringify(stored, null, 2))
-    } else {
+
       try {
-        console.log('downloading', saved.name, saved.url)
-        const file = await downloader.download(saved.url)
-        const upload = await uploadFile(`${saved.name}.${file.ext}`, file.stream)
-        const { height, width } = await getMediaResolution(upload.filePath)
-        stored.push({
-          id: saved.id,
-          title: saved.title,
-          name: saved.name,
-          orgUrl: saved.url,
-          cdnUrl: upload.path,
-          msgId: upload.id,
-          msgUrl: upload.url,
-          created: saved.created,
-          height,
-          width,
-        })
+        if (saved.url.includes('www.reddit.com/gallery/')) {
+          const galleryId = saved.url.split('/').pop()
+          if (galleryId) {
+            const response = await reddit.getPostInfos([`t3_${galleryId}`])
+            if (response.children.length !== 0) {
+              const galleryPost = response.children[0].data
+              saved.gallery_data = galleryPost.gallery_data
+              saved.media_metadata = galleryPost.media_metadata
+            }
+          }
+        }
+
+        if (saved.gallery_data && saved.media_metadata) {
+          await processGalleryPost(saved as any) // Type assertion to handle optional properties
+        } else {
+          await processSinglePost(saved)
+        }
+
+        consecutiveFailures = 0 // Reset on success
         await writeFile('./stored.json', JSON.stringify(stored, null, 2))
       } catch (error) {
         await handleDownloadError(saved, error)
       }
+
+      // Rate limiting
+      await sleep(RATE_LIMIT_DELAY)
+    }
+
+    // Longer delay between batches
+    if (i + BATCH_SIZE < posts.length) {
+      console.log('⏳ Waiting before next batch...')
+      await sleep(RATE_LIMIT_DELAY * 3)
     }
   }
+}
+
+async function processGalleryPost (saved: { name: string, gallery_data: any, media_metadata: any, id: string, title: string, created: number }) {
+  const orgUrls: string[] = []
+  const cdnUrls: string[] = []
+  const msgIds: string[] = []
+  const msgUrls: string[] = []
+  let height = 0
+  let width = 0
+
+  for (const { media_id } of saved.gallery_data.items) {
+    const index = saved.gallery_data.items.findIndex((item: { media_id: string }) => item.media_id === media_id)
+    const media = saved.media_metadata[media_id]
+    const ext = media.m.split('/').pop()
+    if (!ext) continue
+
+    try {
+      const url = `https://i.redd.it/${String(media_id)}.${String(ext)}`
+      console.log('downloading gallery item', String(media_id), url)
+      const file = await downloader.download(url)
+      const upload = await uploadFile(`${String(saved.name)}.${String(index)}.${file.ext}`, file.stream)
+      if (index === 0) {
+        const res = await getMediaResolution(upload.filePath)
+        height = res.height
+        width = res.width
+      }
+      orgUrls.push(url)
+      cdnUrls.push(upload.path)
+      msgIds.push(upload.id)
+      msgUrls.push(upload.url)
+    } catch (error) {
+      console.warn(`Failed to process gallery item ${String(media_id)}:`, error)
+      // Continue with other items instead of failing entire gallery
+    }
+  }
+
+  if (orgUrls.length > 0) {
+    stored.push({
+      id: saved.id,
+      title: saved.title,
+      name: saved.name,
+      orgUrl: orgUrls,
+      cdnUrl: cdnUrls,
+      msgId: msgIds,
+      msgUrl: msgUrls,
+      created: saved.created,
+      height,
+      width,
+    })
+  } else {
+    throw new Error('No gallery items could be processed')
+  }
+}
+
+async function processSinglePost (saved: { name: string, url: string, id: string, title: string, created: number }) {
+  console.log('downloading single post', saved.name, saved.url)
+  const file = await downloader.download(saved.url)
+  const upload = await uploadFile(`${String(saved.name)}.${file.ext}`, file.stream)
+  const { height, width } = await getMediaResolution(upload.filePath)
+  stored.push({
+    id: saved.id,
+    title: saved.title,
+    name: saved.name,
+    orgUrl: saved.url,
+    cdnUrl: upload.path,
+    msgId: upload.id,
+    msgUrl: upload.url,
+    created: saved.created,
+    height,
+    width,
+  })
 }
 
 discord.login(config.DISCORD_TOKEN)
@@ -246,4 +341,36 @@ discord.login(config.DISCORD_TOKEN)
       listing,
       posts: issuePosts,
     }, null, 2))
+    
+    console.log('\n✅ Reddit backup completed successfully!')
+    console.log(`📊 Summary: ${stored.length} posts saved, ${issuePosts.length} issues`)
+  })
+  .catch(async (error) => {
+    console.error('💥 Fatal error during backup:', error)
+    
+    // Save current progress even on error
+    try {
+      oldSaved = oldSaved.filter(id => !stored.find(item => item.name === id))
+      await writeFile('./old.saved.json', JSON.stringify(oldSaved, null, 2))
+      await writeFile('./stored.json', JSON.stringify(stored, null, 2))
+      
+      // Add the termination error to issues
+      issuePosts.push({
+        err: error instanceof Error ? error.message : 'unknown error',
+        id: 'TERMINATED'
+      })
+      
+      await writeFile('./issues.json', JSON.stringify({
+        count: issuePosts.length,
+        listing: '',
+        posts: issuePosts,
+      }, null, 2))
+      
+      console.log(`💾 Progress saved: ${stored.length} posts, ${issuePosts.length} issues`)
+    } catch (saveError) {
+      console.error('❌ Failed to save progress:', saveError)
+    }
+    
+    discord.destroy()
+    process.exit(1)
   })

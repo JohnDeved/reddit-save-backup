@@ -22,23 +22,29 @@ export async function compressMedia (filePath: string) {
     .on('stdout', console.log)
     .on('stderr', console.log)
 
-  // check if file already exists in compressed format
-  if (filePath.endsWith('.mp4') && existsSync(filePath.replace(/\.mp4/, '_cl.mp4'))) {
+  // If file is already compressed to lossy format, return as-is for upload
+  if (filePath.includes('_cl.mp4')) {
+    console.log(`File already compressed to lossy format, returning for upload: ${filePath}`)
+    return filePath
+  }
+
+  // check if file already exists in compressed format (only for original files, not _c files)
+  if (filePath.endsWith('.mp4') && !filePath.includes('_c.mp4') && existsSync(filePath.replace(/\.mp4/, '_cl.mp4'))) {
     console.log('compressed file already exists')
     return filePath.replace(/\.mp4/, '_cl.mp4')
   }
-
-  // if (filePath.endsWith('_cl.mp4')) {
-  //   throw new Error('cannot compress already compressed video')
-  // }
 
   if (filePath.endsWith('_c.mp4')) {
     // adjust bitrate according to video duration to reach 10mb file size. also min scale 720p
     const duration = await new Promise<number | undefined>((resolve, reject) => {
       ffmpeg.input(filePath)
         .ffprobe((err, data) => {
-          if (err) reject(err)
-          else resolve(data.format.duration)
+          if (err) {
+            console.warn(`Failed to probe ${filePath}, file may be corrupted:`, err.message)
+            reject(new Error(`Cannot probe video file ${filePath} - file may be corrupted`))
+          } else {
+            resolve(data.format.duration)
+          }
         })
     })
 
