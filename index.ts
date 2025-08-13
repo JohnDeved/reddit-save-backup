@@ -12,7 +12,7 @@ import { getMediaResolution } from './modules/mediaResolution'
 import { getPinnedClips } from './modules/clips'
 
 // Performance and reliability improvements
-const MAX_CONSECUTIVE_FAILURES = 10
+const MAX_CONSECUTIVE_FAILURES = 100
 const RATE_LIMIT_DELAY = 1000 // 1 second between requests
 const BATCH_SIZE = 20 // Process posts in batches
 
