@@ -7,7 +7,7 @@ import { rm, stat } from 'fs/promises'
 import path from 'path'
 import stored from '@undefined/saved'
 
-async function fetchRetry (url: Parameters<typeof fetch>[0], options?: Parameters<typeof fetch>[1]) {
+async function fetchRetry (url: Parameters<typeof fetch>[0], options?: Parameters<typeof fetch>[1]): Promise<Awaited<ReturnType<typeof fetch>>> {
   try {
     return await fetch(url, options)
   } catch (err) {

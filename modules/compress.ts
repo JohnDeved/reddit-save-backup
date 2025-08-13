@@ -22,15 +22,16 @@ export async function compressMedia (filePath: string) {
     .on('stdout', console.log)
     .on('stderr', console.log)
 
+  // Prevent infinite compression cycles
+  if (filePath.includes('_cl.mp4')) {
+    throw new Error(`File already compressed to lossy format: ${filePath}`)
+  }
+
   // check if file already exists in compressed format
   if (filePath.endsWith('.mp4') && existsSync(filePath.replace(/\.mp4/, '_cl.mp4'))) {
     console.log('compressed file already exists')
     return filePath.replace(/\.mp4/, '_cl.mp4')
   }
-
-  // if (filePath.endsWith('_cl.mp4')) {
-  //   throw new Error('cannot compress already compressed video')
-  // }
 
   if (filePath.endsWith('_c.mp4')) {
     // adjust bitrate according to video duration to reach 10mb file size. also min scale 720p

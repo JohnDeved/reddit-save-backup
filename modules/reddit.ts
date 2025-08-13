@@ -56,7 +56,7 @@ export class Reddit {
     return headers
   }
 
-  async fetch (path: string, method: 'GET' | 'POST' = 'GET', body?: any) {
+  async fetch (path: string, method: 'GET' | 'POST' = 'GET', body?: FormData | URLSearchParams) {
     const headers = await this.getAuthHeader()
 
     console.log(method, path)
@@ -71,7 +71,7 @@ export class Reddit {
     return this.fetch(path)
   }
 
-  async post (path: string, body: any) {
+  async post (path: string, body: FormData | URLSearchParams) {
     return this.fetch(path, 'POST', body)
   }
 
@@ -133,6 +133,8 @@ export class Reddit {
   }
 
   async setUserUnsaved (name: string) {
-    return this.post(`/api/unsave?id=${name}`, {})
+    const formData = new URLSearchParams()
+    formData.append('id', name)
+    return this.post('/api/unsave', formData)
   }
 }
