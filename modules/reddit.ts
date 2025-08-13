@@ -3,7 +3,7 @@ import z from 'zod'
 import { inspect } from 'util'
 
 // Add timeout and retry configuration for Reddit API
-const FETCH_TIMEOUT = 30000 // 30 seconds
+const FETCH_TIMEOUT = 60000 // 60 seconds (increased from 30)
 const MAX_RETRIES = 3
 const RETRY_DELAY = 2000 // 2 seconds
 
@@ -33,7 +33,10 @@ async function fetchWithRetry (url: string, options: Record<string, any> = {}) {
       console.warn(`Reddit API attempt ${attempt}/${MAX_RETRIES} failed for ${url}:`, error)
 
       if (attempt < MAX_RETRIES) {
-        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * attempt))
+        // Exponential backoff: 2s, 4s, 6s
+        const delay = RETRY_DELAY * attempt
+        console.log(`⏳ Retrying in ${delay}ms...`)
+        await new Promise(resolve => setTimeout(resolve, delay))
       }
     }
   }
