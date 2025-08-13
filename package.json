@@ -27,7 +27,7 @@
     "@types/bytes": "^3.1.1",
     "@types/ffprobe-static": "^2.0.1",
     "@types/fluent-ffmpeg": "^2.1.21",
-    "@types/node": "^20.3.2",
+    "@types/node": "^20.19.10",
     "@undefined/lint": "github:JohnDeved/undefined-lint",
     "bytes": "^3.1.2",
     "cheerio": "^1.0.0-rc.12",
