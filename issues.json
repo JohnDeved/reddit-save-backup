@@ -1,26 +1,10 @@
 {
-  "count": 6,
-  "listing": "https://www.reddit.com/api/info?id=t3_awzwod,t3_c7yke1,t3_c5mimc,t3_bc152z,t3_b9sczs,t3_b6hcm9",
+  "count": 2,
+  "listing": "https://www.reddit.com/api/info?id=t3_awzwod,t3_b6hcm9",
   "posts": [
     {
       "err": "direct unexpected URL https://i.vimeocdn.com/video/763732296-0cc90559c7504b7f9dcbe412cdbc4d881d4904b8163e05a6179651cf98020110-d",
       "id": "t3_awzwod"
-    },
-    {
-      "err": "terminated",
-      "id": "t3_c7yke1"
-    },
-    {
-      "err": "terminated",
-      "id": "t3_c5mimc"
-    },
-    {
-      "err": "terminated",
-      "id": "t3_bc152z"
-    },
-    {
-      "err": "terminated",
-      "id": "t3_b9sczs"
     },
     {
       "err": "terminated",
