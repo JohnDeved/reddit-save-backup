@@ -95,10 +95,29 @@ async function uploadFile (name: string, file?: any): Promise<{ filePath: string
   // check if file is bigger than 10mb
   if (size > 10 * 1024 * 1024) {
     console.log(`file is bigger than 10mb ${filePath}, trying to compress`)
-    const compPath = await compressMedia(filePath)
-    const compName = compPath.split('/').pop()
-    if (!compName) throw new Error('no compressed name')
-    return uploadFile(compName)
+    try {
+      const compPath = await compressMedia(filePath)
+      // Extract just the filename from the compressed path for recursive call
+      const compName = compPath.split('/').pop()
+      if (!compName) throw new Error('no compressed name')
+      // The compressed file already exists, so call uploadFile without file stream
+      return uploadFile(compName)
+    } catch (error) {
+      // If compression fails due to corrupted intermediate files, clean them up
+      const compCPath = filePath.replace(/\.mp4$/, '_c.mp4')
+      const compClPath = filePath.replace(/\.mp4$/, '_cl.mp4')
+      
+      if (existsSync(compCPath)) {
+        console.warn(`Removing potentially corrupted file: ${compCPath}`)
+        await unlink(compCPath)
+      }
+      if (existsSync(compClPath)) {
+        console.warn(`Removing potentially corrupted file: ${compClPath}`)
+        await unlink(compClPath)
+      }
+      
+      throw error
+    }
   }
 
   // check if file is smaller than 8kb

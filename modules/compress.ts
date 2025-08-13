@@ -38,8 +38,12 @@ export async function compressMedia (filePath: string) {
     const duration = await new Promise<number | undefined>((resolve, reject) => {
       ffmpeg.input(filePath)
         .ffprobe((err, data) => {
-          if (err) reject(err)
-          else resolve(data.format.duration)
+          if (err) {
+            console.warn(`Failed to probe ${filePath}, file may be corrupted:`, err.message)
+            reject(new Error(`Cannot probe video file ${filePath} - file may be corrupted`))
+          } else {
+            resolve(data.format.duration)
+          }
         })
     })
 

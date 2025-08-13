@@ -139,11 +139,11 @@ class Downloader {
     if (!url.startsWith('http')) throw new Error(`download unexpected URL (removed) ${url}`)
     
     // Block unsupported domains that are known to cause issues - check this FIRST before any network calls
-    const blockedDomains = ['pornhub.com', 'xvideos.com', 'xnxx.com', 'gfycat.com']
+    const blockedDomains = ['pornhub.com', 'xvideos.com', 'xnxx.com', 'gfycat.com', 'cdninstagram.com']
     const { hostname } = new URL(url)
     
     if (blockedDomains.some(domain => hostname.includes(domain))) {
-      throw new Error(`download blocked domain ${hostname} - unsupported site`)
+      throw new Error(`download blocked domain ${hostname} - expired or inaccessible URL`)
     }
     
     const { pathname } = new URL(url)
